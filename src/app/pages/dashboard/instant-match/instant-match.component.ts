@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { PoolUser, WebRtcService } from '@core/services/web-rtc.service';
 
@@ -14,11 +14,14 @@ export class InstantMatchComponent implements OnInit, OnDestroy {
   @ViewChild('localVideo')  localVideoRef!:  ElementRef<HTMLVideoElement>;
   @ViewChild('remoteVideo') remoteVideoRef!: ElementRef<HTMLVideoElement>;
 
+  // inject() runs before field initializers — so webRtc is available immediately
+  webRtc = inject(WebRtcService);
+
   poolUsers$    = this.webRtc.poolUsers$;
   remoteStream$ = this.webRtc.remoteStream$;
   callStatus$   = this.webRtc.callStatus$;
 
-  constructor(public webRtc: WebRtcService) {}
+  constructor() {}
 
   ngOnInit(): void {
     // Join pool — subscribes to signals, connects WebSocket, notifies server

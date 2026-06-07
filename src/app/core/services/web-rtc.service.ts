@@ -2,6 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { WebSocketConnectionService } from './web-socket-connection.service';
 import { AuthService } from './auth.service';
+import { environment } from '@environments/environment';
 
 export interface PoolUser {
   cognitoSub: string;
@@ -38,9 +39,7 @@ export class WebRtcService implements OnDestroy {
   private currentPeerSub: string | null = null;  // the other user's cognitoSub during a call
   private signalSub!: Subscription;
 
-  private readonly ICE_SERVERS: RTCConfiguration = {
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]  // free Google STUN server
-  };
+  private readonly METERED_API_URL = `https://shallweconnect.metered.live/api/v1/turn/credentials?apiKey=${environment.meteredApiKey}`;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -196,7 +195,9 @@ export class WebRtcService implements OnDestroy {
     // Get local camera/mic stream
     this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
-    this.peerConnection = new RTCPeerConnection(this.ICE_SERVERS);
+    // Fetch fresh ICE servers (STUN + TURN) from Metered.ca API
+    const iceServers = await this.fetchIceServers();
+    this.peerConnection = new RTCPeerConnection({ iceServers });
 
     // Add local tracks to the peer connection
     this.localStream.getTracks().forEach(track => {
@@ -226,6 +227,22 @@ export class WebRtcService implements OnDestroy {
         this._callStatus$.next('in-call');
       }
     };
+  }
+
+  /**
+   * Fetches fresh STUN + TURN credentials from Metered.ca.
+   * Falls back to Google STUN if the API call fails.
+   */
+  private async fetchIceServers(): Promise<RTCIceServer[]> {
+    try {
+      const response = await fetch(this.METERED_API_URL);
+      const iceServers: RTCIceServer[] = await response.json();
+      console.log('[WebRTC] ICE servers fetched:', iceServers.length);
+      return iceServers;
+    } catch (err) {
+      console.warn('[WebRTC] Failed to fetch ICE servers, falling back to Google STUN', err);
+      return [{ urls: 'stun:stun.l.google.com:19302' }];
+    }
   }
 
   private cleanupPeerConnection(): void {
