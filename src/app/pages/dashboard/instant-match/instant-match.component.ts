@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { PoolUser, WebRtcService } from '@core/services/web-rtc.service';
 
@@ -9,10 +9,11 @@ import { PoolUser, WebRtcService } from '@core/services/web-rtc.service';
   templateUrl: './instant-match.component.html',
   styleUrl: './instant-match.component.scss'
 })
-export class InstantMatchComponent implements OnInit, OnDestroy {
+export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild('localVideo')  localVideoRef!:  ElementRef<HTMLVideoElement>;
-  @ViewChild('remoteVideo') remoteVideoRef!: ElementRef<HTMLVideoElement>;
+  // { static: true } — resolves ViewChild before ngOnInit, works even without *ngIf
+  @ViewChild('localVideo',  { static: true }) localVideoRef!:  ElementRef<HTMLVideoElement>;
+  @ViewChild('remoteVideo', { static: true }) remoteVideoRef!: ElementRef<HTMLVideoElement>;
 
   // inject() runs before field initializers — so webRtc is available immediately
   webRtc = inject(WebRtcService);
@@ -26,25 +27,32 @@ export class InstantMatchComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Join pool — subscribes to signals, connects WebSocket, notifies server
     this.webRtc.joinPool();
+  }
 
-    // When remote stream arrives, attach it to the <video> element
+  ngAfterViewInit(): void {
+    // ViewChild refs are guaranteed to be ready here — attach streams safely
+
+    // When remote stream arrives → attach to remote <video>
     this.webRtc.remoteStream$.subscribe(stream => {
-      if (stream && this.remoteVideoRef) {
+      if (stream) {
         this.remoteVideoRef.nativeElement.srcObject = stream;
+        console.log('[Component] Remote stream attached to video element');
       }
     });
   }
 
   /** Called when user clicks "Connect" next to a pool user */
   connect(user: PoolUser): void {
-    // Send connection request to selected user
     this.webRtc.requestConnection(user.cognitoSub);
 
-    // Attach local video stream to <video> element
-    const localStream = this.webRtc.getLocalStream();
-    if (localStream && this.localVideoRef) {
-      this.localVideoRef.nativeElement.srcObject = localStream;
-    }
+    // Attach local stream after a small tick to let getUserMedia resolve first
+    setTimeout(() => {
+      const localStream = this.webRtc.getLocalStream();
+      if (localStream) {
+        this.localVideoRef.nativeElement.srcObject = localStream;
+        console.log('[Component] Local stream attached to video element');
+      }
+    }, 500);
   }
 
   /** Called when user clicks "End Call" */

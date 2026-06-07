@@ -6,7 +6,7 @@
   </div>
 
   <!-- ── Available Users Pool ──────────────────────────────────── -->
-  <div class="pool-section" *ngIf="(callStatus$ | async) === 'idle'">
+  <div class="pool-section" [class.hidden]="(callStatus$ | async) !== 'idle'">
     <h3>Available Users</h3>
 
     <p *ngIf="(poolUsers$ | async)?.length === 0">No users available right now...</p>
@@ -20,14 +20,24 @@
     </div>
   </div>
 
-  <!-- ── Video Call Area ────────────────────────────────────────── -->
-  <div class="video-section" *ngIf="(callStatus$ | async) !== 'idle'">
+  <!-- ── Video elements always in DOM so @ViewChild is never null ──────── -->
+  <div class="video-section" [class.hidden]="(callStatus$ | async) === 'idle'">
 
-    <!-- Remote video (full size) -->
-    <video #remoteVideo autoplay playsinline class="remote-video"></video>
+    <div class="video-grid">
 
-    <!-- Local video (picture-in-picture) -->
-    <video #localVideo autoplay playsinline muted class="local-video"></video>
+      <!-- Left: Your local camera -->
+      <div class="video-tile">
+        <video #localVideo autoplay playsinline muted class="video-player"></video>
+        <span class="label">You</span>
+      </div>
+
+      <!-- Right: Remote user's camera -->
+      <div class="video-tile">
+        <video #remoteVideo autoplay playsinline class="video-player"></video>
+        <span class="label">Other User</span>
+      </div>
+
+    </div>
 
     <button class="end-call-btn" (click)="endCall()">End Call</button>
   </div>

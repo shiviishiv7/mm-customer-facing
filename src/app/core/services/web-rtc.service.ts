@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subscription } from 'rxjs';
 import { WebSocketConnectionService } from './web-socket-connection.service';
 import { AuthService } from './auth.service';
 import { environment } from '@environments/environment';
@@ -29,11 +29,13 @@ export class WebRtcService implements OnDestroy {
   private localStream!: MediaStream;
 
   private _poolUsers$    = new BehaviorSubject<PoolUser[]>([]);
-  private _remoteStream$ = new BehaviorSubject<MediaStream | null>(null);
+  // ReplaySubject(1) — replays the last emitted stream to any late subscriber
+  // Fixes the case where ontrack fires before ngAfterViewInit subscribes
+  private _remoteStream$ = new ReplaySubject<MediaStream>(1);
   private _callStatus$   = new BehaviorSubject<string>('idle');  // idle | calling | in-call | ended
 
   public poolUsers$    = this._poolUsers$.asObservable();
-  public remoteStream$ = this._remoteStream$.asObservable();
+  public remoteStream$ = this._remoteStream$.asObservable();  // Observable<MediaStream>
   public callStatus$   = this._callStatus$.asObservable();
 
   private currentPeerSub: string | null = null;  // the other user's cognitoSub during a call
@@ -248,7 +250,9 @@ export class WebRtcService implements OnDestroy {
   private cleanupPeerConnection(): void {
     this.peerConnection?.close();
     this.localStream?.getTracks().forEach(t => t.stop());
-    this._remoteStream$.next(null);
+    // Reset remoteStream$ for next call
+    (this as any)._remoteStream$ = new ReplaySubject<MediaStream>(1);
+    this.remoteStream$ = this._remoteStream$.asObservable();
     this.currentPeerSub = null;
   }
 
