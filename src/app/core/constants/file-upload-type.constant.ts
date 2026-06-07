@@ -1,0 +1,5 @@
+export const FileUploadTypeConstant = {
+  PARAGRAPH_FILE: 'PARAGRAPH_FILE',
+  QUESTION_FILE: 'QUESTION_FILE',
+  OPTION_FILE: 'OPTION_FILE'
+};

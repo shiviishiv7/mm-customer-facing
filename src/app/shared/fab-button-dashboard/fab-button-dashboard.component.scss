@@ -1,0 +1,27 @@
+.floating-button-container {
+  position: fixed; /* Ensures the button stays in a fixed location */
+  top: 4.5rem;    /* Default positioning for larger screens */
+  left: 8px;
+  z-index: 1000;   /* Makes sure it stays above other content */
+}
+//i remove below condition because in phone mode usually our finger does not go on the top of screen
+// but in botton it can touch randomly so keep button ont he top but most of the focus on the top of screen
+// this button is not that relevant so keep in the bottton
+@media (max-width: 768px) {
+  .floating-button-container {
+    top: unset;  /* Unset top to avoid conflict */
+    left: unset; /* Unset left to avoid conflict */
+    bottom: 52px; /* Mobile positioning */
+    left: 8px;
+  }
+}
+
+
+.floating-button {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.floating-button:hover {
+  transform: scale(1.1); /* Slight zoom on hover for better UX */
+}

@@ -1,0 +1,19 @@
+<div class="fab-floating-drawer">
+  <button
+    mat-mini-fab
+
+    color="primary"
+    class="floating-button"
+    (click)="drawer.toggle()"
+    aria-label="Toggle Menu">
+
+    <!-- Display the menu icon based on isDrawerOpen -->
+    <ng-container *ngIf="drawer.opened; else showArrowRef">
+      <i class="bi bi-layout-text-sidebar-reverse" matTooltip="Close question navigation panel"></i>
+    </ng-container>
+    <ng-template #showArrowRef>
+      <i class="bi bi-arrow-right-circle" matTooltip="Open question navigation panel"></i>
+    </ng-template>
+
+  </button>
+</div>

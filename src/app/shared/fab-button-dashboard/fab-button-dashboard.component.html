@@ -1,0 +1,18 @@
+<div class="floating-button-container">
+  <button
+    mat-mini-fab
+    color="primary"
+    class="floating-button"
+    (click)="drawer.toggle()"
+    aria-label="Toggle Menu">
+
+    <!-- Display the menu icon based on isDrawerOpen -->
+    <ng-container *ngIf="drawer.opened; else showArrowRef">
+      <i class="bi bi-layout-text-sidebar-reverse"></i>
+    </ng-container>
+    <ng-template #showArrowRef>
+      <i class="bi bi-arrow-right-circle"></i>
+    </ng-template>
+
+  </button>
+</div>

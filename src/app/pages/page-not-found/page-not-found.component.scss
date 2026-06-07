@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to right, #f5eceb, #fac69d);
+}
+
+mat-card {
+  border-radius: 15px;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  mat-icon {
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+
+  h1 {
+    font-size: 6rem;
+  }
+
+  button {
+    text-transform: none;
+    font-size: 1.2rem;
+  }
+}

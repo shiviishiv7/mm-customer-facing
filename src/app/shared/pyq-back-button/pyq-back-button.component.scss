@@ -1,0 +1,32 @@
+.fancy-back-btn {
+
+  padding: 0.5rem 1rem;
+  border: 2px solid #5e81ac; // Primary color
+  background-color: #eceff4; // Light background
+  color: #5e81ac; // Primary color text
+  border-radius: 30px; // Rounded corners
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+
+  .mat-icon {
+    font-size: 20px;
+  }
+
+  //.btn-text {
+  //  font-size: 16px;
+  //  font-weight: 600;
+  //}
+
+  &:hover {
+    background-color: #5e81ac; // Primary color background
+    color: #fff; // White text
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: translateY(2px); // Button press effect
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}

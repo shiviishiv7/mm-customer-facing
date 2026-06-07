@@ -1,0 +1,66 @@
+.loading-dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; // Full screen overlay
+  background: rgba(0, 0, 0, 0.6); // Transparent dark background
+  z-index: 1050; // High z-index to appear above all content
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  backdrop-filter: blur(10px); // Adds a blur effect to the background for a fancy look
+
+  .spinner-container {
+    animation: pulse 1.5s infinite; // Add a subtle pulsing effect to the spinner container
+  }
+
+  mat-progress-spinner {
+    color: #0d6efd; // Primary color for the spinner
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #ffffff;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); // Adds a slight glow effect to the text
+    margin-top: 20px;
+    animation: fadeIn 2s; // Subtle fade-in animation for the text
+  }
+
+  // Small Screen Adjustments
+  @media (max-width: 576px) {
+    mat-progress-spinner {
+      diameter: 50px !important; // Smaller spinner on mobile
+    }
+
+    p {
+      font-size: 1rem;
+      margin-top: 15px;
+    }
+  }
+
+  // Pulse Animation
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  // Fade-in Animation
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}

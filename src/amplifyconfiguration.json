@@ -1,0 +1,25 @@
+{
+  "aws_project_region": "ap-south-1",
+  "aws_cognito_region": "ap-south-1",
+  "aws_user_pools_id": "ap-south-1_MAPn8meLz",
+  "aws_user_pools_web_client_id": "79jqq7fthcc9e707drf23pj0i9",
+  "oauth": {
+    "domain": "ap-south-1mapn8melz.auth.ap-south-1.amazoncognito.com",
+    "scope": ["phone", "openid", "email"],
+    "redirectSignIn": "https://d84l1y8p4kdic.cloudfront.net",
+    "redirectSignOut": "https://d84l1y8p4kdic.cloudfront.net",
+    "responseType": "code"
+  },
+  "aws_cognito_username_attributes": ["EMAIL"],
+  "aws_cognito_social_providers": [],
+  "aws_cognito_signup_attributes": ["EMAIL", "NAME"],
+  "aws_cognito_mfa_configuration": "OFF",
+  "aws_cognito_mfa_types": ["SMS"],
+  "aws_cognito_password_protection_settings": {
+    "passwordPolicyMinLength": 8,
+    "passwordPolicyCharacters": []
+  },
+  "aws_cognito_verification_mechanisms": ["EMAIL"],
+  "aws_user_files_s3_bucket": "matchmakingresource695304cae2ed413ea35f4f0f848a290a13-dev",
+  "aws_user_files_s3_bucket_region": "ap-south-1"
+}

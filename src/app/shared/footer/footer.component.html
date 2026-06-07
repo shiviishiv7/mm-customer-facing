@@ -1,0 +1,48 @@
+<div class="d-flex flex-column bg-dark-custom text-white py-5 px-3">
+  <div class="row gy-4 offset-md-1 ">
+    <!-- Quick Links Section -->
+    <div class="col-sm-3">
+      <h5 class="text-uppercase mb-4 text-light">Quick Links</h5>
+      <mat-list class="glassmorphic-card p-3">
+        <mat-list-item>
+          <a class="text-white text-decoration-none" [routerLink]="'/general/contact-us'">Contact Us</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a class="text-white text-decoration-none" [routerLink]="'/general/about-us'">About Us</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a class="text-white text-decoration-none" [routerLink]="'/general/reviews'">Reviews</a>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <!-- Logo and Featured Products Section -->
+    <div class="col-md-3"></div>
+    <div class="col-sm-3">
+
+      <!-- Featured Products Section -->
+      <h5 class="text-uppercase mb-3 text-info">Featured Products</h5>
+      <mat-nav-list class="glassmorphic-card p-3">
+        <mat-list-item class="d-flex justify-content-between align-items-center">
+          <span class="text-light">Normal Test</span>
+          <mat-icon class="text-success">check_circle</mat-icon>
+        </mat-list-item>
+        <mat-list-item class="d-flex justify-content-between align-items-center">
+          <span class="text-light">Schedule Test</span>
+          <mat-icon class="text-danger">schedule</mat-icon>
+        </mat-list-item>
+        <mat-list-item class="d-flex justify-content-between align-items-center">
+          <span class="text-light">Marathon Test</span>
+          <mat-icon class="text-warning">flash_on</mat-icon>
+        </mat-list-item>
+      </mat-nav-list>
+    </div>
+  </div>
+
+  <!-- Footer Bottom -->
+  <div class="row mt-5">
+    <div class="col text-center">
+      <small class="text-light">&copy; 2024 matchmaking. All rights reserved.</small>
+    </div>
+  </div>
+</div>

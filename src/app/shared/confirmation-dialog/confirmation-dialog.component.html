@@ -1,0 +1,13 @@
+<div class="confirmation-dialog" id="confirmationDialog">
+  <div class="dialog-content">
+    <h3>{{ title }}</h3>
+    <p>
+      {{ description }}
+    </p>
+
+    <div class="dialog-actions">
+      <button class="cancel-btn shadow rounded" (click)="onCancel()">Cancel</button>
+      <button class="delete-btn" (click)="onConfirm()">Yes</button>
+    </div>
+  </div>
+</div>

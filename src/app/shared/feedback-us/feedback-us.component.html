@@ -1,0 +1,93 @@
+<!--<ng-container *ngIf="QuestionModel; else preparingQuestionPaperRef">-->
+<!--  <div class="row gx-0 vh-100 g-3 p-3">-->
+<!--    &lt;!&ndash; Question Form Section &ndash;&gt;-->
+<!--    <div class="col-md-5 d-flex flex-column">-->
+<!--      <h2 class="mb-3">Question</h2>-->
+<!--      <form #questionForm="ngForm" class="flex-grow-1 d-flex flex-column">-->
+<!--   -->
+
+<!--        &lt;!&ndash; Submit Button &ndash;&gt;-->
+<!--        <div class="mt-4 text-center">-->
+<!--          <button mat-raised-button color="primary" (click)="onSubmit()"-->
+<!--                  [disabled]="!questionForm.form.valid" class="w-50">-->
+<!--            Save Question-->
+<!--          </button>-->
+<!--        </div>-->
+<!--      </form>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Preview Section &ndash;&gt;-->
+<!--    <div class="col-md-7 preview-section shadow-sm rounded overflow-auto p-3">-->
+<!--      <div class="header text-center mb-4">-->
+<!--        <h3>Preview of Question</h3>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Paragraph Preview &ndash;&gt;-->
+<!--      <ng-container *ngIf="QuestionModel.paragraphText || QuestionModel.paragraphUrl; else withoutParagraphRef">-->
+<!--        <div class="row gx-0 g-4">-->
+<!--          <div class="col-md-6">-->
+<!--            <div *ngIf="QuestionModel.paragraphText" class="content-wrapper paragraph-text">-->
+<!--              <p>{{ QuestionModel.paragraphText }}</p>-->
+<!--            </div>-->
+<!--            <div *ngIf="QuestionModel.paragraphUrl" class="content-wrapper image-preview">-->
+<!--              <img [src]="paragraphUrl" alt="Paragraph Image" class="img-fluid"/>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="col-md-6">-->
+<!--            <div class="content-wrapper question-text">-->
+<!--              <div class="text-container" [innerText]="QuestionModel.questionText1"></div>-->
+<!--            </div>-->
+<!--            <div *ngIf="QuestionModel.questionImageUrl" class="content-wrapper image-preview">-->
+<!--              <img [src]="questionImageUrl" alt="Question Image" class="img-fluid"/>-->
+<!--            </div>-->
+<!--            <div *ngIf="QuestionModel.questionText2" class="content-wrapper additional-text">-->
+<!--              <p>{{ QuestionModel.questionText2 }}</p>-->
+<!--            </div>-->
+<!--            <div *ngIf="QuestionModel.options.length > 0" class="content-wrapper options-list">-->
+<!--              <h4>Options:</h4>-->
+<!--              <ul class="list-group">-->
+<!--                <li class="list-group-item mb-1" *ngFor="let option of QuestionModel.options; let i = index">-->
+<!--                  <span [ngClass]="{'fw-bold text-success': option.correct, 'text-secondary': !option.correct}">-->
+<!--                    {{ i + 1 }}: {{ option.optionText }}-->
+<!--                  </span>-->
+<!--                </li>-->
+<!--              </ul>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </ng-container>-->
+
+<!--      <ng-template #withoutParagraphRef>-->
+<!--        <div class="content-wrapper question-text mb-3">-->
+<!--          <div class="text-container" [innerText]="QuestionModel.questionText1"></div>-->
+<!--        </div>-->
+<!--        <div *ngIf="QuestionModel.questionImageUrl" class="content-wrapper image-preview mb-3">-->
+<!--          <img [src]="questionImageUrl" alt="Question Image" class="img-fluid"/>-->
+<!--        </div>-->
+<!--        <div *ngIf="QuestionModel.questionText2" class="content-wrapper additional-text mb-3">-->
+<!--          <p>{{ QuestionModel.questionText2 }}</p>-->
+<!--        </div>-->
+<!--        <div *ngIf="QuestionModel.options.length > 0" class="content-wrapper options-list">-->
+<!--          <h4>Options:</h4>-->
+<!--          <ul class="list-group">-->
+<!--            <li class="list-group-item mb-1" *ngFor="let option of QuestionModel.options; let i = index">-->
+<!--              <span [ngClass]="{'fw-bold text-success': option.correct, 'text-secondary': !option.correct}">-->
+<!--                {{ i + 1 }}: {{ option.optionText }}-->
+<!--              </span>-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--        </div>-->
+<!--      </ng-template>-->
+
+<!--      &lt;!&ndash; Explanation Preview &ndash;&gt;-->
+<!--      <div *ngIf="QuestionModel.explanation" class="content-wrapper explanation">-->
+<!--        <h4>Explanation:</h4>-->
+<!--        <p>{{ QuestionModel.explanation }}</p>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</ng-container>-->
+
+<!--<ng-template #preparingQuestionPaperRef>-->
+<!--  <h4 class="text-center mt-5">Preparing Question Paper...</h4>-->
+<!--</ng-template>-->

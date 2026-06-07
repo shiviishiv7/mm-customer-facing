@@ -1,0 +1,6 @@
+<button [disabled]="isLoading" mat-raised-button color="primary" class="mt-3" (click)="startAuthentication()">
+  Start Test
+  <ng-container *ngIf="isLoading">
+    <app-loading-dialog></app-loading-dialog>
+  </ng-container>
+</button>

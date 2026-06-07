@@ -1,0 +1,25 @@
+.fab-floating-drawer {
+  position: fixed; /* Ensures the button stays in a fixed location */
+  bottom: 0; /* Centers vertically */
+  left: 1rem; /* Right alignment for desktop */
+  transform: translateY(-50%); /* Adjusts for centering */
+  z-index: 2000; /* Makes sure it stays above other content */
+}
+
+@media (max-width: 768px) {
+  .fab-floating-drawer {
+    top: unset; /* Remove vertical centering for mobile */
+    right: unset; /* Align to bottom-right corner for mobile */
+    bottom: 6rem; /* Position at the bottom for mobile */
+    transform: none; /* Remove translation for mobile */
+  }
+}
+
+.floating-button {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds shadow for visual effect */
+  transition: transform 0.3s; /* Smooth transition for hover effect */
+}
+
+.floating-button:hover {
+  transform: scale(1.1); /* Slight zoom on hover for better UX */
+}

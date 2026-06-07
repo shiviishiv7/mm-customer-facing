@@ -1,0 +1,8 @@
+<button mat-raised-button class="" color="accent" (click)="goBackToDashboard()">
+  <ng-container *ngIf="isMobileView">
+    <mat-icon>home</mat-icon>
+  </ng-container>
+  <ng-container *ngIf="!isMobileView">
+    <mat-icon class="me-2">home</mat-icon>
+  </ng-container>
+</button>

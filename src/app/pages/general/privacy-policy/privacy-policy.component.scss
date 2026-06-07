@@ -1,0 +1,56 @@
+.tb-privacy-policy {
+  padding: 1rem;
+
+  .section-heading {
+    font-weight: 600;
+    margin-top: 1.5rem;
+    font-size: 1.25rem;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+
+  .sub-heading {
+    font-weight: 500;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+    }
+  }
+
+  .content-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+    }
+  }
+
+  .content-list {
+    margin-left: 1.5rem;
+    font-size: 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .link {
+    color: #007bff;
+    text-decoration: underline;
+
+    &:hover {
+      color: #0056b3;
+    }
+  }
+}

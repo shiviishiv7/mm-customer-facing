@@ -1,0 +1,21 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <amplify-authenticator [loginMechanisms]="['email']">
+        <ng-template
+          amplifySlot="authenticated"
+          let-user="user"
+          let-signOut="signOut"
+        >
+          <h2>Welcome, {{ user.username }}!</h2>
+          <button matToolti="Click to go to dashboard" mat-icon-button color="accent" (click)="goToDashboard()">
+            <mat-icon>home</mat-icon>
+          </button>
+        </ng-template>
+      </amplify-authenticator>
+
+    </div>
+  </div>
+</div>
+
+

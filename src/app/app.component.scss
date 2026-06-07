@@ -1,0 +1,93 @@
+
+
+.container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+  padding-right: 0; // calc(var(--bs-gutter-x) * .5); */
+  padding-left: 0;
+}
+.mat-drawer-content{
+  min-height: 100vh;
+}
+.styled-drawer {
+  width: 240px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+
+  @media (max-width: 768px) {
+    width: 100vw;
+  }
+}
+
+.link-container {
+  overflow-x: hidden;
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    transition: background-color 0.3s ease;
+
+    mat-icon {
+      font-size: 20px;
+      margin-right: 8px;
+    }
+
+    &:hover {
+      background-color: #34495e;
+    }
+
+    &.active {
+      background-color: #1abc9c;
+      font-weight: bold;
+    }
+  }
+
+  .menu-title {
+    font-weight: bold;
+    margin: 10px 0;
+    color: #ddd;
+  }
+}
+
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e9ecef;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6c757d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #495057;
+}
+//
+///* Responsive Adjustments */
+//@media (max-width: 576px) {
+//  .header-bg {
+//    height: 48px;
+//    padding: 8px 16px;
+//  }
+//
+//  .footer-bg {
+//    height: 48px;
+//    padding: 8px 16px;
+//  }
+//
+//  .main-content {
+//    padding: 12px;
+//  }
+//}

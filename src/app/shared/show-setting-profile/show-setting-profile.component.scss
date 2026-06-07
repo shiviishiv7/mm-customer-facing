@@ -1,0 +1,54 @@
+.profile-card {
+  max-width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .user-icon {
+    font-size: 48px;
+  }
+
+  .user-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .user-sub {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+
+  button {
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  @media (max-width: 576px) {
+    .user-icon {
+      font-size: 36px;
+    }
+
+    .user-name {
+      font-size: 1.1rem;
+    }
+
+    .user-sub {
+      font-size: 0.85rem;
+    }
+
+    button {
+      font-size: 0.8rem;
+    }
+  }
+}

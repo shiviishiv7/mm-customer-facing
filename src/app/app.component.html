@@ -1,0 +1,25 @@
+<div class="container-fluid">
+  <ng-container *ngIf="showHideComponentModel.headerVisibility">
+    <div class="row">
+      <div class="col-md-12">
+        <app-header></app-header>
+      </div>
+    </div>
+  </ng-container>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <ng-container *ngIf="showHideComponentModel.footerVisibility">
+    <div class="row">
+      <div class="col-md-12">
+        <app-footer class="footer-bg"></app-footer>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

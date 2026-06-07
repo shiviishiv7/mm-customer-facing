@@ -1,0 +1,60 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 border-danger shadow-lg rounded-2">
+
+      <mat-drawer-container class="bg-light">
+        <!-- Drawer Section -->
+        <mat-drawer #drawer class="styled-drawer" mode="side" [opened]="!commBus.isMobileView()">
+          <div class="link-container mt-4">
+            <ul class="nav flex-column">
+              <li class="menu-title">Dashboard</li>
+
+              <li class="nav-item">
+                <button
+                  (click)="commBus.isMobileView() && drawer.close()"
+                  class="btn btn-primary w-100 mb-2"
+                  [routerLink]="ApplicationRoutingEnum.INSTANCE_MEETING"
+                  routerLinkActive="active">
+                  <mat-icon class="me-2">visibility</mat-icon>
+                  Test series
+                </button>
+              </li>
+              <!--              <li class="nav-item">-->
+              <!--                <button-->
+              <!--                  (click)="commBus.isMobileView() && drawer.close()"-->
+              <!--                  class="btn btn-primary w-100 mb-2"-->
+              <!--                  [routerLink]="ApplicationRoutingEnum.DASHBOARD_MARATHON"-->
+              <!--                  routerLinkActive="active">-->
+              <!--                  <mat-icon class="me-2">history</mat-icon>-->
+              <!--                  Marathon-->
+              <!--                </button>-->
+              <!--              </li>-->
+              <li class="nav-item">
+                <button
+                  (click)="commBus.isMobileView() && drawer.close()"
+                  class="btn btn-primary w-100 mb-2"
+                  [routerLink]="ApplicationRoutingEnum.LANDING_PAGE"
+                  routerLinkActive="active">
+                  <mat-icon class="me-2">history</mat-icon>
+                  Attempt History
+                </button>
+              </li>
+
+            </ul>
+          </div>
+        </mat-drawer>
+
+        <!-- Main Content Section -->
+        <mat-drawer-content class="mat-drawer-content">
+          <router-outlet></router-outlet>
+          <!--          hello world-->
+        </mat-drawer-content>
+      </mat-drawer-container>
+
+      <!--      &lt;!&ndash; Floating Action Button &ndash;&gt;-->
+      <app-fab-button-dashboard [drawer]="drawer"></app-fab-button-dashboard>
+
+    </div>
+  </div>
+</div>
+

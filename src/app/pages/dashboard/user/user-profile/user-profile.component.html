@@ -1,0 +1,284 @@
+<div class="container gx-0 mt-4 ">
+  <div class="row gx-0 mb-5 vh-100 h-100 overflow-y-auto">
+    <div class="col-md-12 mb-5">
+      <!-- Heading Section -->
+      <div class="mb-4 px-2 d-flex justify-content-between">
+        <div class="">
+          <h2 class="text-primary">User Information</h2>
+        </div>
+        <!--        <div class="">-->
+        <!--          <button mat-raised-button color="accent" (click)="backToPreviousPage()" class="px-4 py-2">-->
+        <!--            <mat-icon class="me-2">home</mat-icon>-->
+        <!--          </button>-->
+        <!--        </div>-->
+
+      </div>
+
+      <!-- User Not Found -->
+      <ng-container *ngIf="current === 1">
+        <div class="alert alert-warning text-center">
+          <p>User does not exist in the database.</p>
+          <!--      <button mat-raised-button color="primary" (click)="createUser()">Create New User</button>-->
+        </div>
+      </ng-container>
+
+      <!-- Form Section -->
+      <ng-container *ngIf="current === 2">
+        <mat-card class="p-4">
+          <mat-card-header>
+            <mat-card-title class="text-secondary">Edit or Add User Details</mat-card-title>
+            <mat-card-subtitle>Ensure all required fields are filled out accurately.</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <form #userForm="ngForm" class="row gx-0 g-3">
+              <!-- Personal Details Section -->
+              <div class="col-12">
+                <h5 class="text-primary">Personal Details</h5>
+                <hr/>
+              </div>
+
+              <!-- First Name -->
+              <div class="col-md-6">
+                <mat-form-field class="w-100">
+                  <mat-label>First Name</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    name="firstName"
+                    [(ngModel)]="user.firstName"
+                    #firstName="ngModel"
+                    required
+                  />
+                  <mat-error *ngIf="firstName.invalid && firstName.touched">First name is required.</mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Last Name -->
+              <div class="col-md-6">
+                <mat-form-field class="w-100">
+                  <mat-label>Last Name</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    name="lastName"
+                    [(ngModel)]="user.lastName"
+                    #lastName="ngModel"
+                    required
+                  />
+                  <mat-error *ngIf="lastName.invalid && lastName.touched">Last name is required.</mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Phone -->
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Phone</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    name="phone"
+                    [(ngModel)]="user.phone"
+                    #phone="ngModel"
+                    maxlength="10"
+                  />
+                  <mat-error *ngIf="phone.invalid && phone.touched">Phone must be a 10-digit number.</mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Gender -->
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Gender</mat-label>
+                  <mat-select
+                    id="gender"
+                    name="gender"
+                    [(ngModel)]="user.gender"
+                    #gender="ngModel"
+                    required
+                  >
+                    <mat-option value="Male">Male</mat-option>
+                    <mat-option value="Female">Female</mat-option>
+                    <mat-option value="Other">Other</mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="gender.invalid && gender.touched">Gender is required.</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Date of Birth</mat-label>
+                  <input
+                    matInput
+                    type="date"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    [(ngModel)]="user.dateOfBirth"
+                  />
+                </mat-form-field>
+              </div>
+
+
+              <!-- Address Section -->
+              <div class="col-12 mt-4">
+                <h5 class="text-primary">Address Details</h5>
+                <hr/>
+              </div>
+
+              <!-- Address -->
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Address</mat-label>
+                  <textarea matInput name="address" [(ngModel)]="user.address"></textarea>
+                </mat-form-field>
+              </div>
+
+              <!-- City -->
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>City</mat-label>
+                  <input matInput type="text" name="city" [(ngModel)]="user.city"/>
+                </mat-form-field>
+              </div>
+
+              <!-- State -->
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>State</mat-label>
+                  <input matInput type="text" name="state" [(ngModel)]="user.state"/>
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>Country</mat-label>
+                  <input matInput type="text" name="state" [(ngModel)]="user.country"/>
+                </mat-form-field>
+              </div>
+
+              <!-- ZIP -->
+              <div class="col-md-4">
+                <mat-form-field class="w-100">
+                  <mat-label>ZIP</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    name="zip"
+                    [(ngModel)]="user.zip"
+                    #zip="ngModel"
+                    maxlength="6"
+                  />
+                  <mat-error *ngIf="zip.invalid && zip.touched">ZIP must be a 6-digit number.</mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="col-12 text-center mt-4">
+                <button matTooltip="Save Changes"
+                        mat-raised-button color="primary" (click)="submitForm(userForm)"
+                        [disabled]="userForm.invalid">Save
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </ng-container>
+
+      <!-- Display User Details -->
+      <ng-container *ngIf="current === 3 && user">
+        <mat-card class="mb-5 mt-4 p-2">
+          <mat-card-header>
+            <mat-card-title class="text-primary">User Overview</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table class="table table-striped">
+              <tbody>
+              <tr>
+                <th scope="row">First Name</th>
+                <td>{{ user.firstName }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Last Name</th>
+                <td>{{ user.lastName }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Email</th>
+                <td>{{ user.sub }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Phone</th>
+                <td>{{ user.phone }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Address</th>
+                <td>{{ user.address }}</td>
+              </tr>
+              <tr>
+                <th scope="row">City</th>
+                <td>{{ user.city }}</td>
+              </tr>
+              <tr>
+                <th scope="row">State</th>
+                <td>{{ user.state }}</td>
+              </tr>
+              <tr>
+                <th scope="row">ZIP</th>
+                <td>{{ user.zip }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+
+          <mat-card-actions class="d-flex justify-content-between mt-3">
+            <!-- Edit Button -->
+
+            <ng-container *ngIf="!adminUser">
+              <button matTooltip="Edit user details"
+                      mat-raised-button
+                      color="accent"
+                      class=""
+                      (click)="current = 2"
+                      aria-label="Edit User Details">
+                <mat-icon class="">edit</mat-icon>
+                User
+              </button>
+            </ng-container>
+
+            <button matTooltip="View user all attempt "
+                    mat-raised-button
+                    color="accent"
+                    class=""
+                    (click)="viewUserAttempt(user)"
+                    aria-label="Edit User Details">
+              <mat-icon class="">visibility</mat-icon>
+              Attempt
+            </button>
+
+            <!-- Update Exams Button -->
+
+            <ng-container *ngIf="adminUser">
+              <button matTooltip="Manage user exam list to appear"
+                      mat-raised-button
+                      color="primary"
+                      class=""
+                      aria-label="Manage Allowed Exams">
+                <mat-icon class="">update</mat-icon>
+                Exams
+              </button>
+            </ng-container>
+
+            <!-- Delete Button -->
+            <ng-container>
+              <button matTooltip="Leave Institution"
+                      mat-raised-button
+                      color="warn"
+                      (click)="removeUserFromInstitution(user)"
+                      aria-label="Remove User">
+                <mat-icon class="">delete</mat-icon>
+                Leave
+              </button>
+            </ng-container>
+          </mat-card-actions>
+        </mat-card>
+      </ng-container>
+    </div>
+  </div>
+</div>

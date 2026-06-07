@@ -1,0 +1,246 @@
+import { inject, Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { WebSocketConnectionService } from './web-socket-connection.service';
+import { AuthService } from './auth.service';
+
+export interface PoolUser {
+  cognitoSub: string;
+  firstName: string;
+  lastName: string;
+  industry: string;
+}
+
+export interface WebRTCSignal {
+  type: 'POOL_LIST' | 'CONNECTION_REQUEST' | 'OFFER' | 'ANSWER' | 'ICE_CANDIDATE' | 'PEER_LEFT';
+  fromUserId: string;
+  toUserId: string;
+  payload: string;  // SDP string or ICE candidate JSON
+}
+
+@Injectable({ providedIn: 'root' })
+export class WebRtcService implements OnDestroy {
+
+  private stomp    = inject(WebSocketConnectionService);
+  private auth     = inject(AuthService);
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  private peerConnection!: RTCPeerConnection;
+  private localStream!: MediaStream;
+
+  private _poolUsers$    = new BehaviorSubject<PoolUser[]>([]);
+  private _remoteStream$ = new BehaviorSubject<MediaStream | null>(null);
+  private _callStatus$   = new BehaviorSubject<string>('idle');  // idle | calling | in-call | ended
+
+  public poolUsers$    = this._poolUsers$.asObservable();
+  public remoteStream$ = this._remoteStream$.asObservable();
+  public callStatus$   = this._callStatus$.asObservable();
+
+  private currentPeerSub: string | null = null;  // the other user's cognitoSub during a call
+  private signalSub!: Subscription;
+
+  private readonly ICE_SERVERS: RTCConfiguration = {
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]  // free Google STUN server
+  };
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
+  /**
+   * Call this when the user opens the find-match screen.
+   * Connects WebSocket, joins pool, and listens for all signals.
+   */
+  joinPool(): void {
+    // Step 1: subscribe to all incoming signals first
+    this.listenForSignals();
+
+    // Step 2: connect WebSocket
+    this.stomp.connect();
+
+    // Step 3: tell server we joined — server sends back pool list
+    this.stomp.publish('/app/webrtc.join', {});
+  }
+
+  /** Call when leaving the screen or ending call */
+  leavePool(): void {
+    this.stomp.publish('/app/webrtc.leave', {
+      toUserId: this.currentPeerSub  // notify peer if in a call
+    });
+    this.cleanupPeerConnection();
+    this.signalSub?.unsubscribe();
+    this.stomp.disconnect();
+    this._callStatus$.next('idle');
+  }
+
+  // ── Step 2: Caller selects a user and sends connection request ─────────────
+
+  requestConnection(targetSub: string): void {
+    this.currentPeerSub = targetSub;
+    this._callStatus$.next('calling');
+
+    this.stomp.publish('/app/webrtc.request', {
+      toUserId: targetSub,
+      payload: ''
+    });
+    console.log('[WebRTC] Connection request sent to:', targetSub);
+  }
+
+  // ── Step 3: Caller creates and sends SDP Offer ────────────────────────────
+
+  async createAndSendOffer(targetSub: string): Promise<void> {
+    this.currentPeerSub = targetSub;
+    await this.setupPeerConnection(targetSub);
+
+    const offer = await this.peerConnection.createOffer();
+    await this.peerConnection.setLocalDescription(offer);
+
+    this.stomp.publish('/app/webrtc.offer', {
+      toUserId: targetSub,
+      payload: JSON.stringify(offer)
+    });
+    console.log('[WebRTC] SDP Offer sent to:', targetSub);
+  }
+
+  // ── Step 4: Callee receives offer, creates and sends SDP Answer ───────────
+
+  async handleOfferAndSendAnswer(signal: WebRTCSignal): Promise<void> {
+    this.currentPeerSub = signal.fromUserId;
+    await this.setupPeerConnection(signal.fromUserId);
+
+    const offer = JSON.parse(signal.payload) as RTCSessionDescriptionInit;
+    await this.peerConnection.setRemoteDescription(offer);
+
+    const answer = await this.peerConnection.createAnswer();
+    await this.peerConnection.setLocalDescription(answer);
+
+    this.stomp.publish('/app/webrtc.answer', {
+      toUserId: signal.fromUserId,
+      payload: JSON.stringify(answer)
+    });
+    console.log('[WebRTC] SDP Answer sent to:', signal.fromUserId);
+  }
+
+  // ── Step 5: Caller receives answer ────────────────────────────────────────
+
+  async handleAnswer(signal: WebRTCSignal): Promise<void> {
+    const answer = JSON.parse(signal.payload) as RTCSessionDescriptionInit;
+    await this.peerConnection.setRemoteDescription(answer);
+    console.log('[WebRTC] Remote description (answer) set');
+  }
+
+  // ── Step 5: ICE Candidate Exchange (both sides) ───────────────────────────
+
+  async handleIceCandidate(signal: WebRTCSignal): Promise<void> {
+    const candidate = JSON.parse(signal.payload) as RTCIceCandidateInit;
+    await this.peerConnection.addIceCandidate(candidate);
+    console.log('[WebRTC] ICE candidate added from:', signal.fromUserId);
+  }
+
+  // ── Internal: Listen for all incoming signals ─────────────────────────────
+
+  private listenForSignals(): void {
+    this.signalSub = this.stomp
+      .receiveData<any>('/user/queue/webrtc')
+      .subscribe(async (data) => {
+
+        // Pool list — just got the list of available users from server
+        if (Array.isArray(data)) {
+          this._poolUsers$.next(data as PoolUser[]);
+          console.log('[WebRTC] Pool list received:', data);
+          return;
+        }
+
+        const signal = data as WebRTCSignal;
+        console.log('[WebRTC] Signal received:', signal.type, 'from:', signal.fromUserId);
+
+        switch (signal.type) {
+
+          // Someone wants to connect to me — I accept and create an offer (caller creates offer)
+          case 'CONNECTION_REQUEST':
+            console.log('[WebRTC] Connection request from:', signal.fromUserId);
+            this._callStatus$.next('calling');
+            // Caller now creates offer after getting callee's acceptance
+            // In a real app you'd show a UI "Accept / Reject" button here
+            // For now, auto-accept: caller creates offer
+            await this.createAndSendOffer(signal.fromUserId);
+            break;
+
+          // I am the callee — received the SDP offer, create answer
+          case 'OFFER':
+            await this.handleOfferAndSendAnswer(signal);
+            this._callStatus$.next('in-call');
+            break;
+
+          // I am the caller — received the SDP answer
+          case 'ANSWER':
+            await this.handleAnswer(signal);
+            this._callStatus$.next('in-call');
+            break;
+
+          // ICE candidate from other peer
+          case 'ICE_CANDIDATE':
+            await this.handleIceCandidate(signal);
+            break;
+
+          // Other peer left or ended call
+          case 'PEER_LEFT':
+            console.log('[WebRTC] Peer left:', signal.fromUserId);
+            this.cleanupPeerConnection();
+            this._callStatus$.next('ended');
+            break;
+        }
+      });
+  }
+
+  // ── Internal: RTCPeerConnection setup ────────────────────────────────────
+
+  private async setupPeerConnection(targetSub: string): Promise<void> {
+    // Get local camera/mic stream
+    this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+    this.peerConnection = new RTCPeerConnection(this.ICE_SERVERS);
+
+    // Add local tracks to the peer connection
+    this.localStream.getTracks().forEach(track => {
+      this.peerConnection.addTrack(track, this.localStream);
+    });
+
+    // When we receive remote video/audio tracks — emit them
+    this.peerConnection.ontrack = (event) => {
+      console.log('[WebRTC] Remote track received');
+      this._remoteStream$.next(event.streams[0]);
+    };
+
+    // When ICE candidates are generated — send them to the other peer via server
+    this.peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        this.stomp.publish('/app/webrtc.ice', {
+          toUserId: targetSub,
+          payload: JSON.stringify(event.candidate)
+        });
+        console.log('[WebRTC] ICE candidate sent to:', targetSub);
+      }
+    };
+
+    this.peerConnection.onconnectionstatechange = () => {
+      console.log('[WebRTC] Connection state:', this.peerConnection.connectionState);
+      if (this.peerConnection.connectionState === 'connected') {
+        this._callStatus$.next('in-call');
+      }
+    };
+  }
+
+  private cleanupPeerConnection(): void {
+    this.peerConnection?.close();
+    this.localStream?.getTracks().forEach(t => t.stop());
+    this._remoteStream$.next(null);
+    this.currentPeerSub = null;
+  }
+
+  /** Returns the local media stream so the component can display it */
+  getLocalStream(): MediaStream | null {
+    return this.localStream ?? null;
+  }
+
+  ngOnDestroy(): void {
+    this.leavePool();
+  }
+}

@@ -1,0 +1,33 @@
+/* Main Header Background */
+.main-header-bg {
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+  backdrop-filter: blur(10px); /* Blur effect */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border-radius: 12px; /* Rounded corners */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Light border for depth */
+  padding: 12px 20px; /* Padding for spacing */
+  //margin: 16px; /* Margin to avoid sticking to edges */
+}
+
+/* Glassmorphism Button */
+.glassmorphism-button {
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+  backdrop-filter: blur(10px); /* Blur effect */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Light border */
+  border-radius: 50%; /* Circular button */
+  width: 40px; /* Fixed width */
+  height: 40px; /* Fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease; /* Smooth hover effect */
+}
+
+.glassmorphism-button:hover {
+  background: rgba(255, 255, 255, 0.3); /* Slightly more opaque on hover */
+}
+
+/* Ensure the icon is white */
+.mat-icon {
+  color: white;
+}

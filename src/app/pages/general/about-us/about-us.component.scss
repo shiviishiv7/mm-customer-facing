@@ -1,0 +1,37 @@
+/* Glassmorphic Card */
+.glassmorphic-card {
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+  backdrop-filter: blur(10px); /* Blur effect */
+  border-radius: 12px; /* Rounded corners */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Light border for depth */
+  transition: background 0.3s ease; /* Smooth hover effect */
+}
+
+.glassmorphic-card:hover {
+  background: rgba(255, 255, 255, 0.2); /* Slightly more opaque on hover */
+}
+
+/* Background for the Page */
+.about-us {
+  background: linear-gradient(135deg, #1e3c72, #2a5298); /* Gradient background */
+  padding: 40px 20px; /* Padding for spacing */
+}
+
+/* Ensure text is visible */
+.text-light {
+  color: rgba(255, 255, 255, 0.9); /* Light text for contrast */
+}
+
+/* CTA Button Styling */
+.cta-button {
+  background-color: #ffc107; /* Yellow background */
+  color: #000; /* Black text */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #e0a800; /* Darker yellow on hover */
+}

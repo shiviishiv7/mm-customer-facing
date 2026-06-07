@@ -1,0 +1,3 @@
+export enum ProductType {
+  NOTES = "NOTES", COURSE = "COURSE", INSTITUTION = "INSTITUTION", EXAM = "EXAM", EBOOK = "E_BOOK"
+}

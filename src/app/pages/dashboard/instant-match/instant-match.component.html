@@ -1,0 +1,35 @@
+<div class="instant-match">
+
+  <!-- ── Status Bar ─────────────────────────────────────────────── -->
+  <div class="status-bar">
+    Status: <strong>{{ callStatus$ | async }}</strong>
+  </div>
+
+  <!-- ── Available Users Pool ──────────────────────────────────── -->
+  <div class="pool-section" *ngIf="(callStatus$ | async) === 'idle'">
+    <h3>Available Users</h3>
+
+    <p *ngIf="(poolUsers$ | async)?.length === 0">No users available right now...</p>
+
+    <div class="user-card" *ngFor="let user of poolUsers$ | async">
+      <div class="user-info">
+        <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+        <span class="industry">{{ user.industry }}</span>
+      </div>
+      <button (click)="connect(user)">Connect</button>
+    </div>
+  </div>
+
+  <!-- ── Video Call Area ────────────────────────────────────────── -->
+  <div class="video-section" *ngIf="(callStatus$ | async) !== 'idle'">
+
+    <!-- Remote video (full size) -->
+    <video #remoteVideo autoplay playsinline class="remote-video"></video>
+
+    <!-- Local video (picture-in-picture) -->
+    <video #localVideo autoplay playsinline muted class="local-video"></video>
+
+    <button class="end-call-btn" (click)="endCall()">End Call</button>
+  </div>
+
+</div>
