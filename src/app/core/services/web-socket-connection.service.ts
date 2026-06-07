@@ -42,7 +42,7 @@ export class WebSocketConnectionService {
     });
   });
 
-  private brokerURL = 'http://localhost:8080/ws'; // Change to your backend URL
+  private brokerURL = environment.wsUrl;
 
 
   // ─── Initialization ────────────────────────────────────────────────────────
