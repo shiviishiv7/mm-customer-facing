@@ -5,10 +5,8 @@ echo "  Frontend — Deployment Start"
 echo "=========================================="
 
 # ── Config ────────────────────────────────────────────────────────────────────
-EC2_USER="ec2-user"
-EC2_IP="3.6.93.180"
-EC2_PATH="/home/ec2-user/frontend"
-BUILD_DIR="dist/student/browser"
+EC2_PATH="/home/ec2-user/frontend"   # Nginx serves from here
+BUILD_DIR="dist/student/browser"     # Angular build output
 
 # ── Pull latest code ──────────────────────────────────────────────────────────
 echo ""
@@ -30,16 +28,17 @@ if [ ! -d "$BUILD_DIR" ]; then
 fi
 echo "Build successful: $BUILD_DIR"
 
-# ── Deploy to EC2 ─────────────────────────────────────────────────────────────
+# ── Deploy to Nginx folder ────────────────────────────────────────────────────
 echo ""
-echo "[3/4] Copying build to EC2..."
-ssh $EC2_USER@$EC2_IP "rm -rf $EC2_PATH && mkdir -p $EC2_PATH"
-scp -r $BUILD_DIR/* $EC2_USER@$EC2_IP:$EC2_PATH/
+echo "[3/4] Copying build to /home/ec2-user/frontend..."
+rm -rf $EC2_PATH
+mkdir -p $EC2_PATH
+cp -r $BUILD_DIR/* $EC2_PATH/
 
 # ── Reload Nginx ──────────────────────────────────────────────────────────────
 echo ""
 echo "[4/4] Reloading Nginx..."
-ssh $EC2_USER@$EC2_IP "sudo systemctl reload nginx"
+sudo systemctl reload nginx
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
