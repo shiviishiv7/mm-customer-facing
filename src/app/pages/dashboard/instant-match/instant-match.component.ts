@@ -30,29 +30,25 @@ export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // ViewChild refs are guaranteed to be ready here — attach streams safely
+    // ViewChild refs guaranteed ready here — attach streams safely
+
+    // When local camera is ready → attach to local <video>
+    this.webRtc.localStream$.subscribe(stream => {
+      this.localVideoRef.nativeElement.srcObject = stream;
+      console.log('[Component] Local stream attached to video element');
+    });
 
     // When remote stream arrives → attach to remote <video>
     this.webRtc.remoteStream$.subscribe(stream => {
-      if (stream) {
-        this.remoteVideoRef.nativeElement.srcObject = stream;
-        console.log('[Component] Remote stream attached to video element');
-      }
+      this.remoteVideoRef.nativeElement.srcObject = stream;
+      console.log('[Component] Remote stream attached to video element');
     });
   }
 
   /** Called when user clicks "Connect" next to a pool user */
   connect(user: PoolUser): void {
+    // Just send connection request — local video attaches automatically via localStream$
     this.webRtc.requestConnection(user.cognitoSub);
-
-    // Attach local stream after a small tick to let getUserMedia resolve first
-    setTimeout(() => {
-      const localStream = this.webRtc.getLocalStream();
-      if (localStream) {
-        this.localVideoRef.nativeElement.srcObject = localStream;
-        console.log('[Component] Local stream attached to video element');
-      }
-    }, 500);
   }
 
   /** Called when user clicks "End Call" */

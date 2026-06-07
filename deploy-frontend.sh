@@ -35,9 +35,11 @@ rm -rf $EC2_PATH
 mkdir -p $EC2_PATH
 cp -r $BUILD_DIR/* $EC2_PATH/
 
-# ── Reload Nginx ──────────────────────────────────────────────────────────────
+# ── Update Nginx config + Reload ──────────────────────────────────────────────
 echo ""
-echo "[4/4] Reloading Nginx..."
+echo "[4/4] Updating Nginx config and reloading..."
+sudo cp nginx/matchmaking.conf /etc/nginx/conf.d/matchmaking.conf
+sudo nginx -t
 sudo systemctl reload nginx
 
 # ── Done ──────────────────────────────────────────────────────────────────────

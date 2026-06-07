@@ -27,15 +27,16 @@ export class WebRtcService implements OnDestroy {
   // ── State ──────────────────────────────────────────────────────────────────
   private peerConnection!: RTCPeerConnection;
   private localStream!: MediaStream;
+  private pendingIceCandidates: RTCIceCandidateInit[] = []; // buffer ICE candidates until peerConnection is ready
 
   private _poolUsers$    = new BehaviorSubject<PoolUser[]>([]);
-  // ReplaySubject(1) — replays the last emitted stream to any late subscriber
-  // Fixes the case where ontrack fires before ngAfterViewInit subscribes
   private _remoteStream$ = new ReplaySubject<MediaStream>(1);
-  private _callStatus$   = new BehaviorSubject<string>('idle');  // idle | calling | in-call | ended
+  private _localStream$  = new ReplaySubject<MediaStream>(1);  // emits when local camera is ready
+  private _callStatus$   = new BehaviorSubject<string>('idle');
 
   public poolUsers$    = this._poolUsers$.asObservable();
-  public remoteStream$ = this._remoteStream$.asObservable();  // Observable<MediaStream>
+  public remoteStream$ = this._remoteStream$.asObservable();
+  public localStream$  = this._localStream$.asObservable();  // component subscribes to this
   public callStatus$   = this._callStatus$.asObservable();
 
   private currentPeerSub: string | null = null;  // the other user's cognitoSub during a call
@@ -108,6 +109,7 @@ export class WebRtcService implements OnDestroy {
 
     const offer = JSON.parse(signal.payload) as RTCSessionDescriptionInit;
     await this.peerConnection.setRemoteDescription(offer);
+    await this.flushPendingIceCandidates(); // apply any buffered ICE candidates
 
     const answer = await this.peerConnection.createAnswer();
     await this.peerConnection.setLocalDescription(answer);
@@ -124,6 +126,7 @@ export class WebRtcService implements OnDestroy {
   async handleAnswer(signal: WebRTCSignal): Promise<void> {
     const answer = JSON.parse(signal.payload) as RTCSessionDescriptionInit;
     await this.peerConnection.setRemoteDescription(answer);
+    await this.flushPendingIceCandidates(); // apply any buffered ICE candidates
     console.log('[WebRTC] Remote description (answer) set');
   }
 
@@ -131,8 +134,25 @@ export class WebRtcService implements OnDestroy {
 
   async handleIceCandidate(signal: WebRTCSignal): Promise<void> {
     const candidate = JSON.parse(signal.payload) as RTCIceCandidateInit;
+
+    if (!this.peerConnection || !this.peerConnection.remoteDescription) {
+      // peerConnection not ready yet — buffer and apply later
+      console.log('[WebRTC] Buffering ICE candidate — peerConnection not ready yet');
+      this.pendingIceCandidates.push(candidate);
+      return;
+    }
+
     await this.peerConnection.addIceCandidate(candidate);
     console.log('[WebRTC] ICE candidate added from:', signal.fromUserId);
+  }
+
+  /** Apply all buffered ICE candidates after remote description is set */
+  private async flushPendingIceCandidates(): Promise<void> {
+    console.log(`[WebRTC] Flushing ${this.pendingIceCandidates.length} buffered ICE candidates`);
+    for (const candidate of this.pendingIceCandidates) {
+      await this.peerConnection.addIceCandidate(candidate);
+    }
+    this.pendingIceCandidates = [];
   }
 
   // ── Internal: Listen for all incoming signals ─────────────────────────────
@@ -194,8 +214,10 @@ export class WebRtcService implements OnDestroy {
   // ── Internal: RTCPeerConnection setup ────────────────────────────────────
 
   private async setupPeerConnection(targetSub: string): Promise<void> {
-    // Get local camera/mic stream
+    // Get local camera/mic stream and immediately emit it
     this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    this._localStream$.next(this.localStream);  // ← component attaches this to <video> element
+    console.log('[WebRTC] Local stream ready');
 
     // Fetch fresh ICE servers (STUN + TURN) from Metered.ca API
     const iceServers = await this.fetchIceServers();
@@ -250,9 +272,12 @@ export class WebRtcService implements OnDestroy {
   private cleanupPeerConnection(): void {
     this.peerConnection?.close();
     this.localStream?.getTracks().forEach(t => t.stop());
-    // Reset remoteStream$ for next call
+    this.pendingIceCandidates = [];
+    // Reset streams for next call
     (this as any)._remoteStream$ = new ReplaySubject<MediaStream>(1);
+    (this as any)._localStream$  = new ReplaySubject<MediaStream>(1);
     this.remoteStream$ = this._remoteStream$.asObservable();
+    this.localStream$  = this._localStream$.asObservable();
     this.currentPeerSub = null;
   }
 
