@@ -6,7 +6,6 @@
 /out-tsc
 /bazel-out
 /amplify
-amplify.yml
 /**.zip
 # Node
 /node_modules
@@ -46,7 +45,6 @@ Thumbs.db
 .vscode
 .idea
 .angular
-amplify.yml
 
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend

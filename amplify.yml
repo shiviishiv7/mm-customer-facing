@@ -1,0 +1,20 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm install 20
+        - nvm use 20
+        - node -v
+        - npm ci --cache .npm --prefer-offline
+    build:
+      commands:
+        - if [ "${AWS_BRANCH}" = "main" ]; then npm run build:prod; fi
+        - if [ "${AWS_BRANCH}" = "development" ]; then npm run build:dev; fi
+  artifacts:
+    baseDirectory: dist/student/browser
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .npm/**/*
