@@ -17,7 +17,10 @@ git pull origin main
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 echo ""
-echo "[2/4] Building Angular production bundle..."
+echo "[2/4] Installing dependencies and building Angular production bundle..."
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # load nvm so npm/ng are available
+npm ci
 npm run build:prod
 
 # Confirm build output exists
