@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "matchmaking-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:localhost"],
+      "port": 4200
+    }
+  ]
+}
