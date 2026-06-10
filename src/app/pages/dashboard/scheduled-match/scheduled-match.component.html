@@ -1,0 +1,48 @@
+<div class="scheduled-match">
+
+  <!-- ── Video elements always in DOM so @ViewChild is never null ── -->
+  <div class="video-section" [class.hidden]="(state$ | async) !== 'in-call'">
+    <div class="video-grid">
+      <div class="video-tile">
+        <video #localVideo autoplay playsinline muted class="video-player"></video>
+        <span class="label">You</span>
+      </div>
+      <div class="video-tile">
+        <video #remoteVideo autoplay playsinline class="video-player"></video>
+        <span class="label">Other User</span>
+      </div>
+    </div>
+    <button class="end-call-btn" (click)="endCall()">End Call</button>
+  </div>
+
+  <!-- ── Idle: no meeting notification yet ── -->
+  <div class="state-panel" *ngIf="(state$ | async) === 'idle'">
+    <div class="icon">📅</div>
+    <h2>Scheduled Meeting</h2>
+    <p>You'll be notified here when your scheduled meeting is about to start.</p>
+  </div>
+
+  <!-- ── Waiting Room: scheduledAt reached, user must click Join ── -->
+  <div class="state-panel" *ngIf="(state$ | async) === 'waiting-room'">
+    <div class="icon">🔔</div>
+    <h2>Your meeting is starting!</h2>
+    <p>Both you and your match have been notified. Click below to join the call.</p>
+    <p class="meeting-id">Meeting: {{ meeting$ | async }}</p>
+    <button class="join-btn" (click)="joinCall()">Join Call</button>
+  </div>
+
+  <!-- ── Waiting for peer ── -->
+  <div class="state-panel" *ngIf="(state$ | async) === 'waiting-for-peer'">
+    <div class="spinner"></div>
+    <h2>Waiting for the other person...</h2>
+    <p>You're in the waiting room. The call will start as soon as they join.</p>
+  </div>
+
+  <!-- ── Call ended ── -->
+  <div class="state-panel" *ngIf="(state$ | async) === 'ended'">
+    <div class="icon">✅</div>
+    <h2>Call ended</h2>
+    <p>Your meeting has finished. You'll be asked for feedback shortly.</p>
+  </div>
+
+</div>

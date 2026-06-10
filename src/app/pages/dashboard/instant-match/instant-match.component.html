@@ -1,45 +1,51 @@
-<div class="instant-match">
-
-  <!-- ── Status Bar ─────────────────────────────────────────────── -->
-  <div class="status-bar">
-    Status: <strong>{{ callStatus$ | async }}</strong>
-  </div>
-
-  <!-- ── Available Users Pool ──────────────────────────────────── -->
-  <div class="pool-section" [class.hidden]="(callStatus$ | async) !== 'idle'">
-    <h3>Available Users</h3>
-
-    <p *ngIf="(poolUsers$ | async)?.length === 0">No users available right now...</p>
-
-    <div class="user-card" *ngFor="let user of poolUsers$ | async">
-      <div class="user-info">
-        <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
-        <span class="industry">{{ user.industry }}</span>
-      </div>
-      <button (click)="connect(user)">Connect</button>
-    </div>
-  </div>
-
-  <!-- ── Video elements always in DOM so @ViewChild is never null ──────── -->
-  <div class="video-section" [class.hidden]="(callStatus$ | async) === 'idle'">
-
-    <div class="video-grid">
-
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
       <!-- Left: Your local camera -->
       <div class="video-tile">
         <video #localVideo autoplay playsinline muted class="video-player"></video>
         <span class="label">You</span>
       </div>
-
+    </div>
+    <div class="col-md-6">
       <!-- Right: Remote user's camera -->
       <div class="video-tile">
         <video #remoteVideo autoplay playsinline class="video-player"></video>
         <span class="label">Other User</span>
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="instant-match">
+
+      <!-- ── Video elements always in DOM so @ViewChild is never null ──────── -->
+      <div class="video-section" [class.hidden]="(callStatus$ | async) === 'idle'">
+
+
+
+        <button class="end-call-btn" (click)="endCall()">End Call</button>
+      </div>
+      <!-- ── Status Bar ─────────────────────────────────────────────── -->
+      <div class="status-bar">
+        Status: <strong>{{ callStatus$ | async }}</strong>
+      </div>
+
+      <!-- ── Available Users Pool ──────────────────────────────────── -->
+      <div class="pool-section" [class.hidden]="(callStatus$ | async) !== 'idle'">
+        <h3>Available Users</h3>
+
+        <p *ngIf="(poolUsers$ | async)?.length === 0">No users available right now...</p>
+
+        <div class="user-card" *ngFor="let user of poolUsers$ | async">
+          <div class="user-info">
+            <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+            <span class="industry">{{ user.industry }}</span>
+          </div>
+          <button (click)="connect(user)">Connect</button>
+        </div>
+      </div>
 
     </div>
-
-    <button class="end-call-btn" (click)="endCall()">End Call</button>
   </div>
-
 </div>
+

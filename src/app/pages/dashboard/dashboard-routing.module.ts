@@ -3,6 +3,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {DashboardComponent} from './dashboard.component';
 import {UserProfileComponent} from './user/user-profile/user-profile.component';
 import {InstantMatchComponent} from './instant-match/instant-match.component';
+import {ScheduledMatchComponent} from './scheduled-match/scheduled-match.component';
 
 
 const routes: Routes = [
@@ -19,6 +20,11 @@ const routes: Routes = [
       {
         path: 'instant-match',
         component: InstantMatchComponent,
+        pathMatch: 'full',
+      },
+      {
+        path: 'scheduled-match',
+        component: ScheduledMatchComponent,
         pathMatch: 'full',
       },
       {

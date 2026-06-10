@@ -72,6 +72,40 @@ export class WebRtcService implements OnDestroy {
     this._callStatus$.next('idle');
   }
 
+  // ── Scheduled match entry points ───────────────────────────────────────────
+
+  /**
+   * Connect WebSocket and start listening for WebRTC signals
+   * without joining the instant-match pool.
+   * Called by ScheduledMatchService when the scheduled-match screen opens.
+   */
+  connectForScheduledMatch(): void {
+    this.listenForSignals();
+    this.stomp.connect();
+  }
+
+  /** Disconnect without touching the pool */
+  disconnectScheduledMatch(): void {
+    if (this.currentPeerSub) {
+      this.stomp.publish('/app/webrtc/signal', {
+        type: 'PEER_LEFT',
+        fromUserId: '',
+        toUserId: this.currentPeerSub,
+        payload: ''
+      });
+    }
+    this.cleanupPeerConnection();
+    this.signalSub?.unsubscribe();
+    this.stomp.disconnect();
+    this._callStatus$.next('idle');
+  }
+
+  /** Called when server says this client should initiate the WebRTC handshake */
+  async initiateScheduledCall(peerSub: string): Promise<void> {
+    this._callStatus$.next('calling');
+    await this.createAndSendOffer(peerSub);
+  }
+
   // ── Step 2: Caller selects a user and sends connection request ─────────────
 
   requestConnection(targetSub: string): void {
@@ -157,7 +191,7 @@ export class WebRtcService implements OnDestroy {
 
   // ── Internal: Listen for all incoming signals ─────────────────────────────
 
-  private listenForSignals(): void {
+  listenForSignals(): void {
     this.signalSub = this.stomp
       .receiveData<any>('/user/queue/webrtc')
       .subscribe(async (data) => {
