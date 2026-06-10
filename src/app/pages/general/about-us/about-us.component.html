@@ -2,9 +2,9 @@
   <!-- Hero Section -->
   <div class="hero-section glassmorphic-card p-5 text-center mb-5">
     <div class="container">
-      <h1 class="hero-title text-light display-4 fw-bold">Welcome to SmartExam</h1>
+      <h1 class="hero-title text-light display-4 fw-bold">Welcome to Shall We Connect</h1>
       <p class="hero-description text-light fs-5">
-        Your ultimate platform for comprehensive test preparation.
+        A smarter way to meet people — meaningful video connections, on your schedule.
       </p>
     </div>
   </div>
@@ -15,9 +15,9 @@
     <div class="glassmorphic-card p-4 mb-4">
       <h2 class="section-title text-light fs-3 fw-bold mb-3">Who We Are</h2>
       <p class="section-description text-light fs-6">
-        SmartExam is an innovative platform dedicated to empowering users with the tools they need
-        to excel in competitive exams. We are passionate about delivering personalized exam experiences and
-        ensuring every user achieves their academic goals.
+        Shall We Connect is a professional matchmaking platform that pairs people for live video conversations
+        based on shared interests, industry, location, and goals. Whether you're looking for an instant connection
+        or want to schedule a meeting at a convenient time, we make meaningful introductions effortless.
       </p>
     </div>
 
@@ -25,8 +25,9 @@
     <div class="glassmorphic-card p-4 mb-4">
       <h2 class="section-title text-light fs-3 fw-bold mb-3">Our Mission</h2>
       <p class="section-description text-light fs-6">
-        To revolutionize test preparation by providing high-quality, accessible, and user-friendly test papers that
-        cater to diverse learning needs. At SmartExam, we aim to inspire confidence and drive success.
+        To break down barriers between professionals and create genuine human connections in a digital-first world.
+        We believe every conversation has the potential to spark something great — a collaboration, a friendship,
+        or the next big idea.
       </p>
     </div>
 
@@ -34,8 +35,11 @@
     <div class="glassmorphic-card p-4 mb-4">
       <h2 class="section-title text-light fs-3 fw-bold mb-3">What We Offer</h2>
       <ul class="offerings text-light fs-6">
-        <li>Interactive mock tests tailored to various competitive exams</li>
-        <li>Real-time performance analysis with personalized feedback</li>
+        <li><strong>Instant Connect</strong> — jump into a live video call with a matched user right now</li>
+        <li><strong>Scheduled Meetings</strong> — book a video call at a time that works for both of you</li>
+        <li><strong>Smart Filters</strong> — match by age, gender, company, college, location and industry</li>
+        <li><strong>In-app Video Calls</strong> — no third-party apps needed, everything runs in your browser</li>
+        <li><strong>Feedback &amp; Rounds</strong> — give feedback after each meeting and choose to connect again</li>
       </ul>
     </div>
 
@@ -44,12 +48,20 @@
       <h2 class="section-title text-light fs-3 fw-bold mb-3">Why Choose Us?</h2>
       <div class="features row">
         <div class="feature col-md-6 mb-3">
-          <h3 class="text-light fs-5 fw-bold">Advanced Analytics</h3>
-          <p class="text-light fs-6">Track your progress with detailed performance reports and insights.</p>
+          <h3 class="text-light fs-5 fw-bold">Real-Time Video</h3>
+          <p class="text-light fs-6">Peer-to-peer WebRTC calls mean zero latency and full privacy — no recording, no middleman.</p>
         </div>
         <div class="feature col-md-6 mb-3">
-          <h3 class="text-light fs-5 fw-bold">User-Friendly Interface</h3>
-          <p class="text-light fs-6">Enjoy a seamless and intuitive experience designed for all users.</p>
+          <h3 class="text-light fs-5 fw-bold">Intelligent Matching</h3>
+          <p class="text-light fs-6">Our compatibility engine scores candidates on industry, location, timezone and preference.</p>
+        </div>
+        <div class="feature col-md-6 mb-3">
+          <h3 class="text-light fs-5 fw-bold">Flexible Scheduling</h3>
+          <p class="text-light fs-6">Can't connect right now? Schedule a meeting and get a reminder when it's time to join.</p>
+        </div>
+        <div class="feature col-md-6 mb-3">
+          <h3 class="text-light fs-5 fw-bold">Privacy First</h3>
+          <p class="text-light fs-6">Contact details are only shared when both parties mutually agree to connect further.</p>
         </div>
       </div>
     </div>
@@ -57,10 +69,10 @@
 
   <!-- CTA Section -->
   <div class="cta-section glassmorphic-card p-5 text-center mb-5">
-    <h2 class="text-light fs-2 fw-bold mb-3">Join SmartExam Today!</h2>
+    <h2 class="text-light fs-2 fw-bold mb-3">Ready to connect?</h2>
     <p class="text-light fs-5 mb-4">
-      Experience a new way of exam preparation and achieve your academic dreams with SmartExam. Let's succeed together!
+      Sign up today and start having conversations that matter. Your next great connection is one click away.
     </p>
-    <a href="/sign-up" class="cta-button btn btn-warning btn-lg fw-bold">Get Started</a>
+    <a [routerLink]="'/signin'" class="cta-button btn btn-warning btn-lg fw-bold">Get Started</a>
   </div>
 </div>

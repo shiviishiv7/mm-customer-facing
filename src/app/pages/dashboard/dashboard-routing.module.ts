@@ -11,15 +11,21 @@ const routes: Routes = [
     path: '',
     component: DashboardComponent,
     children: [
-
       {
         path: 'profile',
         component: UserProfileComponent,
         pathMatch: 'full',
       },
+      // Primary route used on the live site
+      {
+        path: 'instance-meeting',
+        component: InstantMatchComponent,
+        pathMatch: 'full',
+      },
+      // Alias kept for backwards compatibility
       {
         path: 'instant-match',
-        component: InstantMatchComponent,
+        redirectTo: 'instance-meeting',
         pathMatch: 'full',
       },
       {
@@ -29,7 +35,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'instant-match',
+        redirectTo: 'instance-meeting',
         pathMatch: 'full',
       },
     ],

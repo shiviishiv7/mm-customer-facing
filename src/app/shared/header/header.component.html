@@ -1,14 +1,13 @@
 <div class="d-flex justify-content-between align-items-center main-header-bg px-3 py-1">
-  <!-- Logo Section -->
+  <!-- Logo / Brand -->
   <div class="d-flex align-items-center">
-    <a [routerLink]="'/'" class="text-decoration-none">
-      <img src="logo-full.png" alt="Logo" height="40px" class="rounded">
-      <!-- Optional: Brand Name -->
-      <!-- <span class="fs-5 fw-bold ms-2 text-white">Brand Name</span> -->
+    <a [routerLink]="'/'" class="text-decoration-none d-flex align-items-center gap-2">
+      <mat-icon class="brand-icon">favorite</mat-icon>
+      <span class="brand-name">Shall We Connect</span>
     </a>
   </div>
 
-  <!-- Settings or Navigation Section -->
+  <!-- Settings -->
   <ng-container *ngIf="commBus.sub">
     <div>
       <button mat-icon-button (click)="showSetting($event)">

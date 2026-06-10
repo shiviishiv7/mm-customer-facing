@@ -2,69 +2,76 @@
   <div class="hero-section">
     <div class="container text-center">
       <h1 class="hero-title">Our Plans</h1>
-      <p class="hero-description">Choose the perfect plan tailored for Users and Institutions.</p>
+      <p class="hero-description">Choose the plan that fits how you want to connect.</p>
     </div>
   </div>
 
   <div class="product-category container">
-    <!-- User Plans -->
-    <h2 class="category-title">For Users</h2>
+    <!-- Individual Plans -->
+    <h2 class="category-title">For Individuals</h2>
     <div class="row">
-      <!-- Freemium Plan for Users -->
+      <!-- Free Plan -->
       <div class="col-md-6">
         <div class="product-card">
-          <h3 class="product-title">Freemium Plan</h3>
+          <h3 class="product-title">Free Plan</h3>
           <p class="product-price">Free</p>
           <ul class="product-features">
-            <li>Attempt up to 5 test papers for each exam</li>
-            <li>Access limited study materials</li>
-            <li>Basic performance tracking</li>
+            <li>Up to 5 instant connections per month</li>
+            <li>Up to 2 scheduled meetings per month</li>
+            <li>Basic match filters (gender, age)</li>
+            <li>Post-meeting feedback</li>
           </ul>
-          <button mat-raised-button color="primary" class="product-cta">Start for Free</button>
+          <button mat-raised-button color="primary" class="product-cta"
+                  [routerLink]="'/signin'">Get Started</button>
         </div>
       </div>
-      <!-- Premium Plan for Users -->
+      <!-- Pro Plan -->
       <div class="col-md-6">
         <div class="product-card premium">
-          <h3 class="product-title">Premium Plan</h3>
-          <p class="product-price">₹999/year</p>
+          <h3 class="product-title">Pro Plan</h3>
+          <p class="product-price">₹499 / month</p>
           <ul class="product-features">
-            <li>Unlimited attempts for all exams</li>
-            <li>Access to all study materials and videos</li>
-            <li>Comprehensive performance analysis</li>
+            <li>Unlimited instant &amp; scheduled connections</li>
+            <li>Advanced filters — company, college, location</li>
+            <li>Priority matching &amp; shorter wait times</li>
+            <li>Connection history &amp; meeting replays</li>
+            <li>Contact sharing on mutual match</li>
           </ul>
-          <button mat-raised-button color="accent" class="product-cta">Go Premium</button>
+          <button mat-raised-button color="accent" class="product-cta">Go Pro</button>
         </div>
       </div>
     </div>
 
-    <!-- Institution Plans -->
-    <h2 class="category-title">For Institutions</h2>
+    <!-- Enterprise Plans -->
+    <h2 class="category-title">For Companies &amp; Communities</h2>
     <div class="row mb-5">
-      <!-- Freemium Plan for Institutions -->
+      <!-- Starter -->
       <div class="col-md-6">
         <div class="product-card">
-          <h3 class="product-title">Freemium Plan</h3>
-          <p class="product-price">Free</p>
+          <h3 class="product-title">Starter</h3>
+          <p class="product-price">₹2,999 / month</p>
           <ul class="product-features">
-            <li>Create up to 5 exams</li>
-            <li>Allow 50 users to participate</li>
-            <li>Basic exam performance tracking</li>
+            <li>Up to 50 employees / members</li>
+            <li>Internal &amp; cross-company matching</li>
+            <li>Admin dashboard with match analytics</li>
+            <li>Branded waiting room</li>
           </ul>
-          <button mat-raised-button color="primary" class="product-cta">Start for Free</button>
+          <button mat-raised-button color="primary" class="product-cta">Contact Sales</button>
         </div>
       </div>
-      <!-- Premium Plan for Institutions -->
+      <!-- Enterprise -->
       <div class="col-md-6">
         <div class="product-card premium">
-          <h3 class="product-title">Premium Plan</h3>
-          <p class="product-price">₹4999/year</p>
+          <h3 class="product-title">Enterprise</h3>
+          <p class="product-price">Custom pricing</p>
           <ul class="product-features">
-            <li>Create unlimited exams and test papers</li>
-            <li>Allow 500 users to participate</li>
-            <li>Detailed exam performance tracking</li>
+            <li>Unlimited seats</li>
+            <li>SSO / Cognito integration</li>
+            <li>Custom matching rules &amp; weights</li>
+            <li>Dedicated support &amp; SLA</li>
+            <li>White-label option</li>
           </ul>
-          <button mat-raised-button color="accent" class="product-cta">Go Premium</button>
+          <button mat-raised-button color="accent" class="product-cta">Contact Sales</button>
         </div>
       </div>
     </div>
