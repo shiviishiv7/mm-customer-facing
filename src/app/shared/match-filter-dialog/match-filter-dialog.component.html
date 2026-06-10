@@ -1,0 +1,117 @@
+<h2 mat-dialog-title>
+  <mat-icon>tune</mat-icon>
+  Match Filters
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="filter-form">
+
+    <!-- ── Age Range ──────────────────────────────────────────────────────── -->
+    <section class="filter-section">
+      <h3 class="section-title">Age Range</h3>
+      <div class="row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Min age</mat-label>
+          <input matInput type="number" formControlName="minAge" min="18" max="99">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Max age</mat-label>
+          <input matInput type="number" formControlName="maxAge" min="18" max="99">
+        </mat-form-field>
+      </div>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <!-- ── Gender ─────────────────────────────────────────────────────────── -->
+    <section class="filter-section">
+      <h3 class="section-title">Gender Preference</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Preferred gender</mat-label>
+        <mat-select formControlName="preferredGender">
+          <mat-option *ngFor="let g of genderOptions" [value]="g.value">
+            {{ g.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <!-- ── Company ────────────────────────────────────────────────────────── -->
+    <section class="filter-section">
+      <h3 class="section-title">Company</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Preferred company</mat-label>
+        <input matInput formControlName="preferredCompany" placeholder="e.g. Google, Microsoft…">
+        <mat-icon matSuffix>business</mat-icon>
+      </mat-form-field>
+      <mat-slide-toggle formControlName="sameCompanyAllowed" color="primary">
+        Allow matches from my own company
+      </mat-slide-toggle>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <!-- ── Education ──────────────────────────────────────────────────────── -->
+    <section class="filter-section">
+      <h3 class="section-title">Education</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Preferred college / university</mat-label>
+        <input matInput formControlName="preferredCollege" placeholder="e.g. MIT, Stanford…">
+        <mat-icon matSuffix>school</mat-icon>
+      </mat-form-field>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <!-- ── Location ───────────────────────────────────────────────────────── -->
+    <section class="filter-section">
+      <h3 class="section-title">Location</h3>
+      <div class="row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Zip / Postal code</mat-label>
+          <input matInput formControlName="preferredZip">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>City</mat-label>
+          <input matInput formControlName="preferredCity">
+        </mat-form-field>
+      </div>
+      <div class="row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>State / Province</mat-label>
+          <input matInput formControlName="preferredState">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Country</mat-label>
+          <input matInput formControlName="preferredCountry">
+        </mat-form-field>
+      </div>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <!-- ── Timezone Tolerance ─────────────────────────────────────────────── -->
+    <section class="filter-section">
+      <h3 class="section-title">
+        Timezone tolerance — ±{{ form.get('maxTimezoneOffsetHours')?.value }} hr(s)
+      </h3>
+      <mat-slider min="0" max="12" step="1" class="full-width" color="primary">
+        <input matSliderThumb formControlName="maxTimezoneOffsetHours">
+      </mat-slider>
+    </section>
+
+    <!-- ── Error ──────────────────────────────────────────────────────────── -->
+    <p class="error-text" *ngIf="error">{{ error }}</p>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()" [disabled]="saving">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()" [disabled]="saving">
+    <mat-icon>check</mat-icon>
+    {{ saving ? 'Saving…' : 'Save & Find Match' }}
+  </button>
+</mat-dialog-actions>

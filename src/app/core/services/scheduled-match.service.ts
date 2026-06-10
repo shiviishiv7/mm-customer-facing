@@ -52,10 +52,13 @@ export class ScheduledMatchService implements OnDestroy {
       .subscribe(notification => this.handleNotification(notification));
   }
 
-  /** Send join-waiting-room message. */
-  joinWaitingRoom(): void {
+  /** Send join-waiting-room message and start local camera immediately. */
+  async joinWaitingRoom(): Promise<void> {
     const meetingId = this._meetingId$.getValue();
     if (!meetingId) return;
+
+    // Start camera now so user sees themselves while waiting for peer
+    await this.webRtc.startLocalCamera();
 
     this.stomp.publish('/app/meeting/join-waiting-room', {
       meetingId,

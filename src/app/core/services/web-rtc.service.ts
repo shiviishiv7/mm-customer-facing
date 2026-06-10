@@ -245,6 +245,22 @@ export class WebRtcService implements OnDestroy {
       });
   }
 
+  /**
+   * Starts the local camera/mic and emits to localStream$ without
+   * setting up a peer connection. Used in the scheduled match waiting room
+   * so the user can see themselves while waiting for the peer to join.
+   */
+  async startLocalCamera(): Promise<void> {
+    if (this.localStream) return; // already running
+    try {
+      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this._localStream$.next(this.localStream);
+      console.log('[WebRTC] Local camera started (waiting room)');
+    } catch (err) {
+      console.error('[WebRTC] Failed to start local camera:', err);
+    }
+  }
+
   // ── Internal: RTCPeerConnection setup ────────────────────────────────────
 
   private async setupPeerConnection(targetSub: string): Promise<void> {
