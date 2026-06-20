@@ -1,18 +1,35 @@
-<div class="d-flex justify-content-between align-items-center main-header-bg px-3 py-1">
-  <!-- Logo / Brand -->
-  <div class="d-flex align-items-center">
-    <a [routerLink]="'/'" class="text-decoration-none d-flex align-items-center gap-2">
-      <mat-icon class="brand-icon">favorite</mat-icon>
-      <span class="brand-name">Shall We Connect</span>
-    </a>
-  </div>
+<nav class="navbar navbar-expand-lg navbar-dark border-bottom shadow-sm py-2 px-3 main-header-bg"
+     style="background-color: #1e1b4b; border-color: #312e81 !important;">
+  <div class="container-fluid d-flex justify-content-between align-items-center gap-3">
 
-  <!-- Settings -->
-  <ng-container *ngIf="commBus.sub">
-    <div>
-      <button mat-icon-button (click)="showSetting($event)">
-        <mat-icon color="primary">settings</mat-icon>
-      </button>
+    <!-- Left Side: Logo / Brand Route Link -->
+    <div class="d-flex align-items-center">
+      <a [routerLink]="'/'" class="text-decoration-none d-flex align-items-center gap-2">
+        <!-- Custom Gradient Brand Logo Container -->
+
+        <span class="navbar-brand font-weight-bold text-white mb-0 tracking-tight ml-1 brand-name" style="color: #f8fafc !important;">
+          Shall We Connect
+        </span>
+      </a>
     </div>
-  </ng-container>
-</div>
+
+    <!-- Right Side: Status Badge & Dynamic Settings Dropdown -->
+    <div class="d-flex align-items-center gap-3">
+      <!-- "Corporate Only" Badge Context -->
+      <span class="badge badge-pill px-3 py-2 text-white-50 border"
+            style="font-size: 0.75rem; background-color: #312e81; border-color: #4338ca !important;">
+        Corporate Only
+      </span>
+
+      <!-- Conditional Operational Settings Control -->
+      <ng-container *ngIf="commBus.sub">
+        <div class="ml-2">
+          <button mat-icon-button (click)="showSetting($event)" aria-label="Open settings menu">
+            <mat-icon style="color: #818cf8;">settings</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+
+  </div>
+</nav>

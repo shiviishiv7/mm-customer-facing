@@ -208,7 +208,7 @@ export class CommunicationBusService {
     // const hostname = this.extractInstitutionCode(window.location.hostname);
     this.checkViewport();
     this.authenticationChangeListener();
-    this.startAttemptingExam();
+    // this.startAttemptingExam();
   }
 
 

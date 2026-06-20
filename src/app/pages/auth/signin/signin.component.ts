@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {CommunicationBusService} from '@shared/services/communication-bus.service';
 
-import {SigninDialogComponent} from '../signin-dialog/signin-dialog.component';
+
 import {MatDialog} from '@angular/material/dialog';
 
 @Component({
