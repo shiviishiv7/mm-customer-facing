@@ -1,11 +1,15 @@
 <div class="container-fluid">
 
-  <!-- ── Video grid — always in DOM so @ViewChild is never null ──────────── -->
+  <!-- ── Video grid ──────────────────────────────────────────────────────── -->
   <div class="row">
     <div class="col-md-6">
       <div class="video-tile">
         <video #localVideo autoplay playsinline muted class="video-player"></video>
         <span class="label">You</span>
+      </div>
+      <!-- Face-filter picker lives under the local video tile -->
+      <div class="filter-picker-wrap" [class.hidden]="(callStatus$ | async) === 'idle'">
+        <app-avatar-picker></app-avatar-picker>
       </div>
     </div>
     <div class="col-md-6">
@@ -20,7 +24,7 @@
   <div class="row mt-3">
     <div class="instant-match">
 
-      <!-- Header: title + filter button -->
+      <!-- Header -->
       <div class="header-row">
         <h3 class="screen-title">Instant Connect</h3>
         <button mat-stroked-button color="primary" (click)="openFilters()"
@@ -35,9 +39,47 @@
         Status: <strong>{{ callStatus$ | async }}</strong>
       </div>
 
-      <!-- End call button -->
-      <div class="video-section" [class.hidden]="(callStatus$ | async) === 'idle'">
-        <button class="end-call-btn" (click)="endCall()">End Call</button>
+      <!-- In-call controls: End + Next + Filter -->
+      <div class="call-controls" [class.hidden]="(callStatus$ | async) === 'idle'">
+        <button class="end-call-btn" (click)="endCall()">
+          <mat-icon style="font-size:1rem;height:1rem;width:1rem;vertical-align:middle">call_end</mat-icon>
+          End
+        </button>
+        <button class="next-btn" (click)="nextUser()">
+          <mat-icon style="font-size:1rem;height:1rem;width:1rem">skip_next</mat-icon>
+          Next
+        </button>
+        <button mat-stroked-button color="primary" (click)="openFilters()">
+          <mat-icon>tune</mat-icon>
+          Filter
+        </button>
+      </div>
+
+      <!-- Chat panel — visible during an active call -->
+      <div class="chat-panel" [class.hidden]="(callStatus$ | async) === 'idle'">
+        <div class="chat-header">
+          <mat-icon style="font-size:1rem;height:1rem;width:1rem">chat</mat-icon>
+          Chat
+        </div>
+        <div class="chat-messages" #chatScroll>
+          <ng-container *ngIf="(chatMessages$ | async)?.length === 0">
+            <p class="chat-empty">No messages yet. Say hi!</p>
+          </ng-container>
+          <div *ngFor="let msg of chatMessages$ | async"
+               class="chat-bubble"
+               [class.mine]="msg.sentByMe"
+               [class.theirs]="!msg.sentByMe">
+            {{ msg.message }}
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input #chatInput type="text" placeholder="Type a message…"
+                 (keyup.enter)="sendChat(chatInput)"
+                 maxlength="500">
+          <button (click)="sendChat(chatInput)">
+            <mat-icon style="font-size:1.1rem;height:1.1rem;width:1.1rem">send</mat-icon>
+          </button>
+        </div>
       </div>
 
       <!-- Available Users Pool -->

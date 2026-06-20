@@ -68,6 +68,23 @@ export class ScheduledMatchService implements OnDestroy {
     this._state$.next('waiting-for-peer');
   }
 
+  /**
+   * Called when the user clicks Connect on a listed meeting.
+   * Transitions directly to waiting-room without waiting for server push.
+   */
+  triggerWaitingRoom(meetingId: string, matchId: string): void {
+    this._meetingId$.next(meetingId);
+    this._matchId$.next(matchId);
+    this._state$.next('waiting-room');
+  }
+
+  /** Reset back to idle (e.g. after call ended, user clicks Back). */
+  resetToIdle(): void {
+    this._meetingId$.next(null);
+    this._matchId$.next(null);
+    this._state$.next('idle');
+  }
+
   /** End the call and clean up. */
   endCall(): void {
     this.webRtc.disconnectScheduledMatch();

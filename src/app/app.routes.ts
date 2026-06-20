@@ -1,5 +1,6 @@
-import {Routes} from '@angular/router';
-import {authGuard} from './core/guards/auth.guard';
+import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { VRoidCallbackComponent } from './pages/auth/vroid-callback/vroid-callback.component';
 
 
 
@@ -32,7 +33,10 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./pages/auth/auth.module').then(m => m.AuthModule),
   },
-  {path: '', redirectTo: 'landing', pathMatch: 'full'}, // Default landing page
+  // VRoid Hub OAuth callback — no auth guard, must be accessible before login
+  { path: 'auth/vroid/callback', component: VRoidCallbackComponent },
+
+  {path: '', redirectTo: 'landing', pathMatch: 'full'},
   {
     path: '**',
     loadChildren: () =>

@@ -43,26 +43,140 @@
 
 .hidden { display: none; }
 
+.filter-picker-wrap {
+  margin-top: 0.5rem;
+}
+
 .status-bar {
   font-size: 0.9rem;
   color: #555;
   margin-bottom: 1rem;
 }
 
-.end-call-btn {
-  display: block;
-  background: #e53935;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 2rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
+/* ── In-call controls row ──────────────────────────────────── */
+.call-controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   margin-bottom: 1rem;
 
-  &:hover { background: #b71c1c; }
+  .end-call-btn {
+    background: #e53935;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    &:hover { background: #b71c1c; }
+  }
+
+  .next-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    &:hover { background: #1565c0; }
+  }
 }
 
+/* ── Chat panel ────────────────────────────────────────────── */
+.chat-panel {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 320px;
+  margin-top: 0.5rem;
+
+  .chat-header {
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #333;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chat-empty {
+    color: #aaa;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .chat-bubble {
+    max-width: 75%;
+    padding: 0.4rem 0.75rem;
+    border-radius: 16px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+
+    &.mine {
+      align-self: flex-end;
+      background: #1976d2;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    &.theirs {
+      align-self: flex-start;
+      background: #f0f0f0;
+      color: #222;
+      border-bottom-left-radius: 4px;
+    }
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    border-top: 1px solid #e0e0e0;
+
+    input {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.9rem;
+      outline: none;
+
+      &:focus { border-color: #1976d2; }
+    }
+
+    button {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.4rem 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      &:hover { background: #1565c0; }
+    }
+  }
+}
+
+/* ── Pool section ──────────────────────────────────────────── */
 .pool-section {
   .empty-state {
     color: #888;

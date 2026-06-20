@@ -1,7 +1,8 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, ReplaySubject, Subscription } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject, Subscription } from 'rxjs';
 import { WebSocketConnectionService } from './web-socket-connection.service';
 import { AuthService } from './auth.service';
+import { AvatarService } from './avatar/avatar.service';
 import { environment } from '@environments/environment';
 
 export interface PoolUser {
@@ -21,8 +22,9 @@ export interface WebRTCSignal {
 @Injectable({ providedIn: 'root' })
 export class WebRtcService implements OnDestroy {
 
-  private stomp    = inject(WebSocketConnectionService);
-  private auth     = inject(AuthService);
+  private stomp        = inject(WebSocketConnectionService);
+  private auth         = inject(AuthService);
+  private avatarService = inject(AvatarService);
 
   // ── State ──────────────────────────────────────────────────────────────────
   private peerConnection!: RTCPeerConnection;
@@ -33,14 +35,17 @@ export class WebRtcService implements OnDestroy {
   private _remoteStream$ = new ReplaySubject<MediaStream>(1);
   private _localStream$  = new ReplaySubject<MediaStream>(1);  // emits when local camera is ready
   private _callStatus$   = new BehaviorSubject<string>('idle');
+  private _dataChannel$  = new Subject<MessageEvent>();   // emits raw DataChannel messages
 
   public poolUsers$    = this._poolUsers$.asObservable();
   public remoteStream$ = this._remoteStream$.asObservable();
-  public localStream$  = this._localStream$.asObservable();  // component subscribes to this
+  public localStream$  = this._localStream$.asObservable();
   public callStatus$   = this._callStatus$.asObservable();
+  public dataChannel$  = this._dataChannel$.asObservable(); // ChatService subscribes here
 
-  private currentPeerSub: string | null = null;  // the other user's cognitoSub during a call
+  private currentPeerSub: string | null = null;
   private signalSub!: Subscription;
+  private dataChannel: RTCDataChannel | null = null;
 
   private readonly METERED_API_URL = `https://shallweconnect.metered.live/api/v1/turn/credentials?apiKey=${environment.meteredApiKey}`;
 
@@ -123,7 +128,7 @@ export class WebRtcService implements OnDestroy {
 
   async createAndSendOffer(targetSub: string): Promise<void> {
     this.currentPeerSub = targetSub;
-    await this.setupPeerConnection(targetSub);
+    await this.setupPeerConnection(targetSub, true);
 
     const offer = await this.peerConnection.createOffer();
     await this.peerConnection.setLocalDescription(offer);
@@ -254,8 +259,9 @@ export class WebRtcService implements OnDestroy {
     if (this.localStream) return; // already running
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      this._localStream$.next(this.localStream);
-      console.log('[WebRTC] Local camera started (waiting room)');
+      const filtered = await this.avatarService.start(this.localStream);
+      this._localStream$.next(filtered);
+      console.log('[WebRTC] Local camera started (waiting room, avatar)');
     } catch (err) {
       console.error('[WebRTC] Failed to start local camera:', err);
     }
@@ -263,20 +269,38 @@ export class WebRtcService implements OnDestroy {
 
   // ── Internal: RTCPeerConnection setup ────────────────────────────────────
 
-  private async setupPeerConnection(targetSub: string): Promise<void> {
-    // Get local camera/mic stream and immediately emit it
+  private async setupPeerConnection(targetSub: string, isCaller = false): Promise<void> {
+    // Capture raw camera/mic
     this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    this._localStream$.next(this.localStream);  // ← component attaches this to <video> element
-    console.log('[WebRTC] Local stream ready');
+
+    // Run the raw stream through AvatarService → Three.js canvas pipeline.
+    // The avatar stream is what the local preview shows AND what gets sent to the peer.
+    const filteredStream = await this.avatarService.start(this.localStream);
+    this._localStream$.next(filteredStream);
+    console.log('[WebRTC] Local stream ready (avatar)');
 
     // Fetch fresh ICE servers (STUN + TURN) from Metered.ca API
     const iceServers = await this.fetchIceServers();
     this.peerConnection = new RTCPeerConnection({ iceServers });
 
-    // Add local tracks to the peer connection
-    this.localStream.getTracks().forEach(track => {
-      this.peerConnection.addTrack(track, this.localStream);
+    // Add filtered tracks to peer connection (peer receives filtered video)
+    filteredStream.getTracks().forEach(track => {
+      this.peerConnection.addTrack(track, filteredStream);
     });
+
+    // ── Data channel for in-call chat ─────────────────────────────────────
+    // Only the caller creates the channel; the callee receives it via ondatachannel.
+    // Both sides setting up createDataChannel was causing duplicate messages.
+    if (isCaller) {
+      this.dataChannel = this.peerConnection.createDataChannel('chat', { ordered: true });
+      this.wireDataChannel(this.dataChannel);
+    } else {
+      this.peerConnection.ondatachannel = (event) => {
+        console.log('[WebRTC] DataChannel received from peer');
+        this.dataChannel = event.channel;
+        this.wireDataChannel(this.dataChannel);
+      };
+    }
 
     // When we receive remote video/audio tracks — emit them
     this.peerConnection.ontrack = (event) => {
@@ -303,6 +327,24 @@ export class WebRtcService implements OnDestroy {
     };
   }
 
+  /** Subscribe to DataChannel events and forward messages to dataChannel$. */
+  private wireDataChannel(channel: RTCDataChannel): void {
+    channel.onopen    = () => console.log('[WebRTC] DataChannel open');
+    channel.onclose   = () => console.log('[WebRTC] DataChannel closed');
+    channel.onmessage = (event) => this._dataChannel$.next(event);
+    channel.onerror   = (err)   => console.error('[WebRTC] DataChannel error', err);
+  }
+
+  /** Send a chat message over the WebRTC data channel. */
+  sendChatMessage(payload: string): boolean {
+    if (this.dataChannel?.readyState === 'open') {
+      this.dataChannel.send(payload);
+      return true;
+    }
+    console.warn('[WebRTC] DataChannel not open — message dropped');
+    return false;
+  }
+
   /**
    * Fetches fresh STUN + TURN credentials from Metered.ca.
    * Falls back to Google STUN if the API call fails.
@@ -320,6 +362,9 @@ export class WebRtcService implements OnDestroy {
   }
 
   private cleanupPeerConnection(): void {
+    this.avatarService.stop();
+    this.dataChannel?.close();
+    this.dataChannel = null;
     this.peerConnection?.close();
     this.localStream?.getTracks().forEach(t => t.stop());
     this.pendingIceCandidates = [];

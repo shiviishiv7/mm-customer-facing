@@ -1,0 +1,22 @@
+<div class="home-container">
+  <div class="greeting">
+    <h2>{{ greeting }}, <span class="name">{{ auth.name || 'there' }}</span> 👋</h2>
+    <p class="subtitle">What would you like to do today?</p>
+  </div>
+
+  <div class="action-cards">
+    <div class="card" (click)="goInstant()">
+      <mat-icon class="card-icon">flash_on</mat-icon>
+      <h3>Instant Meeting</h3>
+      <p>Connect right now with someone who matches your filters.</p>
+      <button mat-flat-button color="primary">Start Now</button>
+    </div>
+
+    <div class="card" (click)="goScheduled()">
+      <mat-icon class="card-icon">event</mat-icon>
+      <h3>Scheduled Meeting</h3>
+      <p>Browse your upcoming meetings and join when ready.</p>
+      <button mat-flat-button color="accent">View Schedule</button>
+    </div>
+  </div>
+</div>

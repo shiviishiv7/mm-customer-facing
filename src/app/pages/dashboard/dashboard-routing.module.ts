@@ -4,6 +4,7 @@ import {DashboardComponent} from './dashboard.component';
 import {UserProfileComponent} from './user/user-profile/user-profile.component';
 import {InstantMatchComponent} from './instant-match/instant-match.component';
 import {ScheduledMatchComponent} from './scheduled-match/scheduled-match.component';
+import {HomeComponent} from './home/home.component';
 
 
 const routes: Routes = [
@@ -12,17 +13,20 @@ const routes: Routes = [
     component: DashboardComponent,
     children: [
       {
+        path: 'home',
+        component: HomeComponent,
+        pathMatch: 'full',
+      },
+      {
         path: 'profile',
         component: UserProfileComponent,
         pathMatch: 'full',
       },
-      // Primary route used on the live site
       {
         path: 'instance-meeting',
         component: InstantMatchComponent,
         pathMatch: 'full',
       },
-      // Alias kept for backwards compatibility
       {
         path: 'instant-match',
         redirectTo: 'instance-meeting',
@@ -35,7 +39,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'instance-meeting',
+        redirectTo: 'home',
         pathMatch: 'full',
       },
     ],

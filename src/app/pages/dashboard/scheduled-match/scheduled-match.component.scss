@@ -23,10 +23,21 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1rem;
+  align-items: start;
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
+}
+
+.video-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-picker-wrap {
+  width: 100%;
 }
 
 .video-tile {
@@ -154,6 +165,75 @@
 
   &:hover {
     background: #1565c0;
+  }
+}
+
+// ── Meeting list ───────────────────────────────────────────────────────────
+
+.meeting-list-panel {
+  width: 100%;
+  max-width: 640px;
+  text-align: left;
+
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #222;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: #888;
+    padding: 2rem 0;
+  }
+}
+
+.meeting-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+
+  .meeting-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    .peer-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .meeting-time {
+      font-size: 0.82rem;
+      color: #666;
+    }
+
+    .meeting-meta {
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+  }
+
+  .connect-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &:hover { background: #1565c0; }
   }
 }
 

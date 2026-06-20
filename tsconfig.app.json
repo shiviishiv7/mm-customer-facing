@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "types": [],
+    "skipLibCheck": true,
     "baseUrl": "src",
     "paths": {
       "@core/*": ["app/core/*"],

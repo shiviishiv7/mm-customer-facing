@@ -1,0 +1,96 @@
+<h2 mat-dialog-title>
+  <mat-icon style="vertical-align:middle;margin-right:6px">person_search</mat-icon>
+  Browse VRoid Hub Avatars
+</h2>
+
+<mat-dialog-content class="dialog-body">
+
+  <!-- ── Not logged in ─────────────────────────────────────────────────────── -->
+  <div class="login-prompt" *ngIf="!(isLoggedIn$ | async)">
+    <div class="vroid-logo">🎭</div>
+    <h3>Connect your VRoid Hub account</h3>
+    <p>Access your own characters and avatars you've liked — millions of free VRM models.</p>
+    <button mat-flat-button color="primary" (click)="login()">
+      <mat-icon>open_in_new</mat-icon>
+      Login with VRoid Hub
+    </button>
+  </div>
+
+  <!-- ── Logged in ─────────────────────────────────────────────────────────── -->
+  <ng-container *ngIf="isLoggedIn$ | async">
+
+    <div class="top-bar">
+      <button mat-stroked-button color="warn" (click)="logout()">
+        <mat-icon>logout</mat-icon> Disconnect
+      </button>
+      <button mat-icon-button (click)="loadCharacters()" matTooltip="Refresh">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+
+    <div class="loading-wrap" *ngIf="loading">
+      <mat-progress-spinner mode="indeterminate" diameter="40" color="primary"></mat-progress-spinner>
+      <p>Loading your characters…</p>
+    </div>
+
+    <p class="error-msg" *ngIf="error">{{ error }}</p>
+
+    <mat-tab-group *ngIf="!loading">
+
+      <!-- My Characters -->
+      <mat-tab label="My Characters ({{ myCharacters.length }})">
+        <div class="char-grid" *ngIf="myCharacters.length; else emptyMine">
+          <div class="char-card"
+               *ngFor="let c of myCharacters"
+               [class.selecting]="loadingId === c.id"
+               (click)="selectCharacter(c)">
+            <div class="thumb-wrap">
+              <img [src]="c.icon?.sq170" [alt]="c.name" class="thumb"
+                   onerror="this.src='assets/icons/icon-96x96.png'">
+              <div class="overlay" *ngIf="loadingId === c.id">
+                <mat-progress-spinner mode="indeterminate" diameter="28" color="accent"></mat-progress-spinner>
+              </div>
+            </div>
+            <span class="char-name">{{ c.name }}</span>
+          </div>
+        </div>
+        <ng-template #emptyMine>
+          <p class="empty">No characters yet.
+            <a href="https://vroid.com/en/studio" target="_blank">Create one with VRoid Studio →</a>
+          </p>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Hearted Characters -->
+      <mat-tab label="Liked ❤️ ({{ heartedCharacters.length }})">
+        <div class="char-grid" *ngIf="heartedCharacters.length; else emptyHeart">
+          <div class="char-card"
+               *ngFor="let c of heartedCharacters"
+               [class.selecting]="loadingId === c.id"
+               (click)="selectCharacter(c)">
+            <div class="thumb-wrap">
+              <img [src]="c.icon?.sq170" [alt]="c.name" class="thumb"
+                   onerror="this.src='assets/icons/icon-96x96.png'">
+              <div class="overlay" *ngIf="loadingId === c.id">
+                <mat-progress-spinner mode="indeterminate" diameter="28" color="accent"></mat-progress-spinner>
+              </div>
+            </div>
+            <span class="char-name">{{ c.name }}</span>
+          </div>
+        </div>
+        <ng-template #emptyHeart>
+          <p class="empty">No liked characters yet.
+            <a href="https://hub.vroid.com/en/characters" target="_blank">Browse VRoid Hub →</a>
+          </p>
+        </ng-template>
+      </mat-tab>
+
+    </mat-tab-group>
+
+  </ng-container>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

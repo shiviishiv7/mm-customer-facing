@@ -13,30 +13,10 @@
                 <button
                   (click)="commBus.isMobileView() && drawer.close()"
                   class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.INSTANCE_MEETING"
+                  [routerLink]="ApplicationRoutingEnum.HOME"
                   routerLinkActive="active">
-                  <mat-icon class="me-2">visibility</mat-icon>
-                  Test series
-                </button>
-              </li>
-              <!--              <li class="nav-item">-->
-              <!--                <button-->
-              <!--                  (click)="commBus.isMobileView() && drawer.close()"-->
-              <!--                  class="btn btn-primary w-100 mb-2"-->
-              <!--                  [routerLink]="ApplicationRoutingEnum.DASHBOARD_MARATHON"-->
-              <!--                  routerLinkActive="active">-->
-              <!--                  <mat-icon class="me-2">history</mat-icon>-->
-              <!--                  Marathon-->
-              <!--                </button>-->
-              <!--              </li>-->
-              <li class="nav-item">
-                <button
-                  (click)="commBus.isMobileView() && drawer.close()"
-                  class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.SCHEDULED_MATCH"
-                  routerLinkActive="active">
-                  <mat-icon class="me-2">event</mat-icon>
-                  Scheduled Meeting
+                  <mat-icon class="me-2">home</mat-icon>
+                  Home
                 </button>
               </li>
 
@@ -44,10 +24,21 @@
                 <button
                   (click)="commBus.isMobileView() && drawer.close()"
                   class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.LANDING_PAGE"
+                  [routerLink]="ApplicationRoutingEnum.INSTANCE_MEETING"
                   routerLinkActive="active">
-                  <mat-icon class="me-2">history</mat-icon>
-                  Attempt History
+                  <mat-icon class="me-2">flash_on</mat-icon>
+                  Instant Meeting
+                </button>
+              </li>
+
+              <li class="nav-item">
+                <button
+                  (click)="commBus.isMobileView() && drawer.close()"
+                  class="btn btn-primary w-100 mb-2"
+                  [routerLink]="ApplicationRoutingEnum.SCHEDULED_MATCH"
+                  routerLinkActive="active">
+                  <mat-icon class="me-2">event</mat-icon>
+                  Schedule Meeting
                 </button>
               </li>
 
