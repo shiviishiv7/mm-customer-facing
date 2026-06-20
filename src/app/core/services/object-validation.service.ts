@@ -29,16 +29,16 @@ export class ObjectValidationService {
   userValidate(st: UserModel): boolean {
 
 
-    if (!st.sub || st.sub.trim() === '') {
-      this.notificationService.error('Email is required.');
-      return false;
-    }
+    // if (!st.sub || st.sub.trim() === '') {
+    //   this.notificationService.error('Email is required.');
+    //   return false;
+    // }
 
-    const subRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    if (!subRegex.test(st.sub)) {
-      this.notificationService.error('Invalid sub format.');
-      return false;
-    }
+    // const subRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    // if (!subRegex.test(st.sub)) {
+    //   this.notificationService.error('Invalid sub format.');
+    //   return false;
+    // }
 
     const phoneRegex = /^\d{10}$/;
     if (st.phone && !phoneRegex.test(st.phone)) {
@@ -46,24 +46,48 @@ export class ObjectValidationService {
       return false;
     }
 
-    if (!st.dateOfBirth || st.dateOfBirth.trim() === '') {
+    // --- Change this block ---
+    if (!st.dateOfBirth) {
       this.notificationService.error('Date of Birth is required.');
       return false;
     }
 
+    // If it's a Date object, convert it to an ISO string snippet (YYYY-MM-DD) for regex checking
+    let dobStr = '';
+    if (st.dateOfBirth instanceof Date) {
+      // Check if it's an invalid date object
+      if (isNaN(st.dateOfBirth.getTime())) {
+        this.notificationService.error('Invalid Date of Birth.');
+        return false;
+      }
+      // Formats cleanly to YYYY-MM-DD safely handling timezone offsets
+      dobStr = st.dateOfBirth.toISOString().split('T')[0];
+    } else if (typeof st.dateOfBirth === 'string') {
+      dobStr = st.dateOfBirth.trim();
+      if (dobStr === '') {
+        this.notificationService.error('Date of Birth is required.');
+        return false;
+      }
+    } else {
+      this.notificationService.error('Invalid Date of Birth format.');
+      return false;
+    }
+
     const dobRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dobRegex.test(st.dateOfBirth)) {
+    if (!dobRegex.test(dobStr)) {
       this.notificationService.error('Date of Birth must be in YYYY-MM-DD format.');
       return false;
     }
+    // -------------------------
 
     if (!st.gender || st.gender.trim() === '') {
       this.notificationService.error('Gender is required.');
       return false;
     }
 
-    if (st.gender !== 'Male' && st.gender !== 'Female' && st.gender !== 'Other') {
-      this.notificationService.error('Gender must be Male, Female, or Other.');
+    const validGenders = ['MALE', 'FEMALE', 'NON_BINARY', 'PREFER_NOT_TO_SAY'];
+    if (!validGenders.includes(st.gender)) {
+      this.notificationService.error('Gender must be Male, Female, Non-Binary, or Prefer Not to Say.');
       return false;
     }
 

@@ -1,180 +1,155 @@
-<div class="container gx-0 mt-4 ">
-  <div class="row gx-0 mb-5 vh-100 h-100 overflow-y-auto">
-    <div class="col-md-12 mb-5">
-      <!-- Heading Section -->
-      <div class="mb-4 px-2 d-flex justify-content-between">
-        <div class="">
-          <h2 class="text-primary">User Information</h2>
-        </div>
-        <!--        <div class="">-->
-        <!--          <button mat-raised-button color="accent" (click)="backToPreviousPage()" class="px-4 py-2">-->
-        <!--            <mat-icon class="me-2">home</mat-icon>-->
-        <!--          </button>-->
-        <!--        </div>-->
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
 
+      <!-- Top Section Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-light">
+        <div>
+          <h2 class="h3 font-weight-bold mb-0 text-indigo" style="color: #1e1b4b; font-weight: 700;">User Profile Management</h2>
+          <p class="text-muted small mb-0">View or modify onboarding parameters safely</p>
+        </div>
       </div>
 
-      <!-- User Not Found -->
+      <!-- State 1: User Not Found Interface Banner -->
       <ng-container *ngIf="current === 1">
-        <div class="alert alert-warning text-center">
-          <p>User does not exist in the database.</p>
-          <!--      <button mat-raised-button color="primary" (click)="createUser()">Create New User</button>-->
+        <div class="alert shadow-sm border-0 p-4 text-center d-flex flex-column align-items-center justify-content-center"
+             style="background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b !important; border-radius: 0.75rem;">
+          <mat-icon style="color: #d97706; font-size: 32px; width: 32px; height: 32px;" class="mb-2">warning</mat-icon>
+          <h4 class="h6 font-weight-bold text-dark mb-1">Account Synchronization Pending</h4>
+          <p class="text-muted small mb-0">The requested identity profile mapping does not exist in our matching directory database layer.</p>
         </div>
       </ng-container>
 
-      <!-- Form Section -->
+      <!-- State 2: Edit or Add User Details Interactive Form -->
       <ng-container *ngIf="current === 2">
-        <mat-card class="p-4">
-          <mat-card-header>
-            <mat-card-title class="text-secondary">Edit or Add User Details</mat-card-title>
-            <mat-card-subtitle>Ensure all required fields are filled out accurately.</mat-card-subtitle>
+        <mat-card class="shadow-sm border-0 p-3 rounded-lg bg-white">
+          <mat-card-header class="mb-4">
+            <mat-card-title class="h5 font-weight-bold mb-1" style="color: #312e81;">Edit Profile Parameters</mat-card-title>
+            <mat-card-subtitle class="text-muted small">Ensure all required fields match official corporate credentials.</mat-card-subtitle>
           </mat-card-header>
+
           <mat-card-content>
-            <form #userForm="ngForm" class="row gx-0 g-3">
-              <!-- Personal Details Section -->
-              <div class="col-12">
-                <h5 class="text-primary">Personal Details</h5>
-                <hr/>
+            <form #userForm="ngForm" class="row g-3">
+
+              <!-- Divider Header: Personal Details -->
+              <div class="col-12 mt-2 mb-1">
+                <div class="d-flex align-items-center text-indigo font-weight-bold gap-2" style="color: #4338ca; font-size: 0.9rem; tracking-spacing: 0.05em;">
+                  <mat-icon style="font-size: 18px; width:18px; height:18px;">badge</mat-icon>
+                  <span>PERSONAL CREDENTIALS</span>
+                </div>
+                <hr class="mt-2 mb-1" style="border-color: #e2e8f0;"/>
               </div>
 
               <!-- First Name -->
               <div class="col-md-6">
-                <mat-form-field class="w-100">
+                <mat-form-field appearance="outline" class="w-100">
                   <mat-label>First Name</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    name="firstName"
-                    [(ngModel)]="user.firstName"
-                    #firstName="ngModel"
-                    required
-                  />
-                  <mat-error *ngIf="firstName.invalid && firstName.touched">First name is required.</mat-error>
+                  <input matInput type="text" name="firstName" [(ngModel)]="user.firstName" #firstName="ngModel" required />
+                  <mat-error *ngIf="firstName.invalid && firstName.touched">First name field is required.</mat-error>
                 </mat-form-field>
               </div>
 
               <!-- Last Name -->
               <div class="col-md-6">
-                <mat-form-field class="w-100">
+                <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Last Name</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    name="lastName"
-                    [(ngModel)]="user.lastName"
-                    #lastName="ngModel"
-                    required
-                  />
-                  <mat-error *ngIf="lastName.invalid && lastName.touched">Last name is required.</mat-error>
+                  <input matInput type="text" name="lastName" [(ngModel)]="user.lastName" #lastName="ngModel" required />
+                  <mat-error *ngIf="lastName.invalid && lastName.touched">Last name field is required.</mat-error>
                 </mat-form-field>
               </div>
 
               <!-- Phone -->
               <div class="col-md-4">
-                <mat-form-field class="w-100">
-                  <mat-label>Phone</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    name="phone"
-                    [(ngModel)]="user.phone"
-                    #phone="ngModel"
-                    maxlength="10"
-                  />
-                  <mat-error *ngIf="phone.invalid && phone.touched">Phone must be a 10-digit number.</mat-error>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Phone Number</mat-label>
+                  <input matInput type="text" name="phone" [(ngModel)]="user.phone" #phone="ngModel" maxlength="10" />
+                  <mat-error *ngIf="phone.invalid && phone.touched">Requires valid 10-digit contact structure.</mat-error>
                 </mat-form-field>
               </div>
 
-              <!-- Gender -->
+              <!-- Gender Selection -->
               <div class="col-md-4">
-                <mat-form-field class="w-100">
-                  <mat-label>Gender</mat-label>
-                  <mat-select
-                    id="gender"
-                    name="gender"
-                    [(ngModel)]="user.gender"
-                    #gender="ngModel"
-                    required
-                  >
-                    <mat-option value="Male">Male</mat-option>
-                    <mat-option value="Female">Female</mat-option>
-                    <mat-option value="Other">Other</mat-option>
+                <!-- Update your mat-select options like this -->
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Gender Alignment</mat-label>
+                  <mat-select name="gender" [(ngModel)]="user.gender" #gender="ngModel" required>
+                    <mat-option value="MALE">Male</mat-option>
+                    <mat-option value="FEMALE">Female</mat-option>
+                    <mat-option value="NON_BINARY">Non-Binary</mat-option>
+                    <mat-option value="PREFER_NOT_TO_SAY">Prefer Not to Say</mat-option>
                   </mat-select>
-                  <mat-error *ngIf="gender.invalid && gender.touched">Gender is required.</mat-error>
+                  <mat-error *ngIf="gender.invalid && gender.touched">Gender identity parameter is required.</mat-error>
                 </mat-form-field>
               </div>
 
+              <!-- Date of Birth (Upgraded native binding picker syntax) -->
               <div class="col-md-4">
-                <mat-form-field class="w-100">
+                <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Date of Birth</mat-label>
-                  <input
-                    matInput
-                    type="date"
-                    id="dateOfBirth"
-                    name="dateOfBirth"
-                    [(ngModel)]="user.dateOfBirth"
-                  />
+                  <input matInput [matDatepicker]="picker" name="dateOfBirth" [(ngModel)]="user.dateOfBirth">
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
               </div>
 
-
-              <!-- Address Section -->
-              <div class="col-12 mt-4">
-                <h5 class="text-primary">Address Details</h5>
-                <hr/>
+              <!-- Divider Header: Corporate Locality Data -->
+              <div class="col-12 mt-4 mb-1">
+                <div class="d-flex align-items-center text-indigo font-weight-bold gap-2" style="color: #4338ca; font-size: 0.9rem; tracking-spacing: 0.05em;">
+                  <mat-icon style="font-size: 18px; width:18px; height:18px;">place</mat-icon>
+                  <span>LOCALITY & GEOGRAPHY DETAILS</span>
+                </div>
+                <hr class="mt-2 mb-1" style="border-color: #e2e8f0;"/>
               </div>
 
               <!-- Address -->
-              <div class="col-md-4">
-                <mat-form-field class="w-100">
-                  <mat-label>Address</mat-label>
-                  <textarea matInput name="address" [(ngModel)]="user.address"></textarea>
+              <div class="col-md-12">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Street Address</mat-label>
+                  <textarea matInput name="address" [(ngModel)]="user.address" rows="2"></textarea>
                 </mat-form-field>
               </div>
 
               <!-- City -->
-              <div class="col-md-4">
-                <mat-form-field class="w-100">
+              <div class="col-md-3 col-sm-6">
+                <mat-form-field appearance="outline" class="w-100">
                   <mat-label>City</mat-label>
                   <input matInput type="text" name="city" [(ngModel)]="user.city"/>
                 </mat-form-field>
               </div>
 
               <!-- State -->
-              <div class="col-md-4">
-                <mat-form-field class="w-100">
-                  <mat-label>State</mat-label>
+              <div class="col-md-3 col-sm-6">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>State / Region</mat-label>
                   <input matInput type="text" name="state" [(ngModel)]="user.state"/>
                 </mat-form-field>
               </div>
-              <div class="col-md-4">
-                <mat-form-field class="w-100">
+
+              <!-- Country (FIXED: Swapped incorrect template duplicate name metadata attribute) -->
+              <div class="col-md-3 col-sm-6">
+                <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Country</mat-label>
-                  <input matInput type="text" name="state" [(ngModel)]="user.country"/>
+                  <input matInput type="text" name="country" [(ngModel)]="user.country"/>
                 </mat-form-field>
               </div>
 
-              <!-- ZIP -->
-              <div class="col-md-4">
-                <mat-form-field class="w-100">
-                  <mat-label>ZIP</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    name="zip"
-                    [(ngModel)]="user.zip"
-                    #zip="ngModel"
-                    maxlength="6"
-                  />
-                  <mat-error *ngIf="zip.invalid && zip.touched">ZIP must be a 6-digit number.</mat-error>
+              <!-- ZIP/Postal -->
+              <div class="col-md-3 col-sm-6">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>ZIP / Postal Code</mat-label>
+                  <input matInput type="text" name="zip" [(ngModel)]="user.zip" #zip="ngModel" maxlength="6" />
+                  <mat-error *ngIf="zip.invalid && zip.touched">Must be a valid 6-digit reference string.</mat-error>
                 </mat-form-field>
               </div>
 
-              <!-- Submit Button -->
-              <div class="col-12 text-center mt-4">
-                <button matTooltip="Save Changes"
-                        mat-raised-button color="primary" (click)="submitForm(userForm)"
-                        [disabled]="userForm.invalid">Save
+              <!-- Core Execution Form Actions Bar -->
+              <div class="col-12 text-right mt-4 pt-2 border-top border-light">
+                <button mat-raised-button
+                        style="background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border-radius: 0.5rem; min-width: 120px;"
+                        (click)="submitForm(userForm)"
+                        [disabled]="userForm.invalid"
+                        matTooltip="Commit payload state modifications">
+                  Save Verification Changes
                 </button>
               </div>
             </form>
@@ -182,103 +157,86 @@
         </mat-card>
       </ng-container>
 
-      <!-- Display User Details -->
+      <!-- State 3: Clean Read-Only Structured Overview Grid -->
       <ng-container *ngIf="current === 3 && user">
-        <mat-card class="mb-5 mt-4 p-2">
-          <mat-card-header>
-            <mat-card-title class="text-primary">User Overview</mat-card-title>
+        <mat-card class="shadow-sm border-0 p-3 rounded-lg bg-white">
+          <mat-card-header class="mb-3">
+            <mat-card-title class="h5 font-weight-bold text-dark mb-1">Corporate Overview</mat-card-title>
+            <mat-card-subtitle class="text-muted small">Verified profile attributes currently active within matching pools.</mat-card-subtitle>
           </mat-card-header>
+
           <mat-card-content>
-            <table class="table table-striped">
-              <tbody>
-              <tr>
-                <th scope="row">First Name</th>
-                <td>{{ user.firstName }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Last Name</th>
-                <td>{{ user.lastName }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Email</th>
-                <td>{{ user.sub }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Phone</th>
-                <td>{{ user.phone }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Address</th>
-                <td>{{ user.address }}</td>
-              </tr>
-              <tr>
-                <th scope="row">City</th>
-                <td>{{ user.city }}</td>
-              </tr>
-              <tr>
-                <th scope="row">State</th>
-                <td>{{ user.state }}</td>
-              </tr>
-              <tr>
-                <th scope="row">ZIP</th>
-                <td>{{ user.zip }}</td>
-              </tr>
-              </tbody>
-            </table>
+            <div class="table-responsive rounded border border-light">
+              <table class="table table-striped table-hover mb-0" style="font-size: 0.9rem;">
+                <tbody>
+                <tr>
+                  <th scope="row" class="text-secondary font-weight-medium border-0 py-3 pl-4" style="width: 30%;">Full Name</th>
+                  <td class="font-weight-bold text-dark border-0 py-3">{{ user.firstName }} {{ user.lastName }}</td>
+                </tr>
+                <tr>
+                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Cognito Mapping Identity</th>
+                  <td class="text-muted font-monospace py-3" style="font-size: 0.85rem;">{{ user.sub }}</td>
+                </tr>
+                <tr>
+                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Primary Workspace Contact</th>
+                  <td class="text-dark py-3">{{ user.phone || 'Not Configured' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Office Locality Bounds</th>
+                  <td class="text-dark py-3">
+                    <span *ngIf="user.address">{{ user.address }}, </span>
+                    <span>{{ user.city }}</span><span *ngIf="user.state">, {{ user.state }}</span><span *ngIf="user.zip"> - {{ user.zip }}</span>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           </mat-card-content>
 
-          <mat-card-actions class="d-flex justify-content-between mt-3">
-            <!-- Edit Button -->
+          <!-- System Layout Management Actions Dashboard -->
+          <mat-card-actions class="d-flex flex-wrap align-items-center justify-content-between p-3 mt-3 border-top border-light gap-2">
 
-            <ng-container *ngIf="!adminUser">
-              <button matTooltip="Edit user details"
-                      mat-raised-button
-                      color="accent"
-                      class=""
-                      (click)="current = 2"
-                      aria-label="Edit User Details">
-                <mat-icon class="">edit</mat-icon>
-                User
+            <div class="d-flex gap-2">
+              <ng-container *ngIf="!adminUser">
+                <button mat-raised-button
+                        style="background-color: #312e81; color: white;"
+                        (click)="current = 2"
+                        matTooltip="Modify structural attribute keys">
+                  <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">edit</mat-icon>
+                  Modify Parameters
+                </button>
+              </ng-container>
+
+              <button mat-raised-button
+                      style="background-color: #475569; color: white;"
+                      (click)="viewUserAttempt(user)"
+                      matTooltip="Inspect pool connection event arrays">
+                <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">visibility</mat-icon>
+                View Match Attempts
               </button>
-            </ng-container>
 
-            <button matTooltip="View user all attempt "
-                    mat-raised-button
-                    color="accent"
-                    class=""
-                    (click)="viewUserAttempt(user)"
-                    aria-label="Edit User Details">
-              <mat-icon class="">visibility</mat-icon>
-              Attempt
+              <ng-container *ngIf="adminUser">
+                <button mat-raised-button
+                        style="background-color: #4338ca; color: white;"
+                        matTooltip="Configure matching pool allowance profiles">
+                  <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">update</mat-icon>
+                  Manage Exam Pools
+                </button>
+              </ng-container>
+            </div>
+
+            <button mat-raised-button
+                    color="warn"
+                    (click)="removeUserFromInstitution(user)"
+                    matTooltip="Terminate workspace session associations safely">
+              <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">logout</mat-icon>
+              Leave Space
             </button>
 
-            <!-- Update Exams Button -->
-
-            <ng-container *ngIf="adminUser">
-              <button matTooltip="Manage user exam list to appear"
-                      mat-raised-button
-                      color="primary"
-                      class=""
-                      aria-label="Manage Allowed Exams">
-                <mat-icon class="">update</mat-icon>
-                Exams
-              </button>
-            </ng-container>
-
-            <!-- Delete Button -->
-            <ng-container>
-              <button matTooltip="Leave Institution"
-                      mat-raised-button
-                      color="warn"
-                      (click)="removeUserFromInstitution(user)"
-                      aria-label="Remove User">
-                <mat-icon class="">delete</mat-icon>
-                Leave
-              </button>
-            </ng-container>
           </mat-card-actions>
         </mat-card>
       </ng-container>
+
     </div>
   </div>
 </div>

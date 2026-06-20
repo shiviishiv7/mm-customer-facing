@@ -9,7 +9,7 @@ export class UserModel {
   zip: string;
   country: string;
   message: string;
-  dateOfBirth: string; // YYYY-MM-DD format
+  dateOfBirth: any; // YYYY-MM-DD format
   gender: string; // Male, Female, or Other
   governmentIdType: string;
   governmentIdNumber: string;
