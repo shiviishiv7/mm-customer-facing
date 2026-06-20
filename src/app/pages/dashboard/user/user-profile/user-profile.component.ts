@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UserModel} from '@core/models/class/user-model';
 import {finalize, Subscription, tap} from 'rxjs';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -16,7 +16,7 @@ import {environment} from '../../../../../environments/environment';
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
 })
-export class UserProfileComponent {
+export class UserProfileComponent implements OnInit{
 
   current = 1;
   user: UserModel;

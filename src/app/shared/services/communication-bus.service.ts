@@ -216,7 +216,6 @@ export class CommunicationBusService {
     this.hubListener = Hub.listen('auth', ({payload}) => {
       switch (payload.event as any) { // Type assertion to bypass TS2678
         case 'signedIn':
-          of(true).pipe(delay(1000), tap(v => this.createUser())).subscribe()
           this.checkCurrentUser();
           break;
 
