@@ -28,57 +28,25 @@ export class ObjectValidationService {
 
   userValidate(st: UserModel): boolean {
 
-
-    // if (!st.sub || st.sub.trim() === '') {
-    //   this.notificationService.error('Email is required.');
-    //   return false;
-    // }
-
-    // const subRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    // if (!subRegex.test(st.sub)) {
-    //   this.notificationService.error('Invalid sub format.');
-    //   return false;
-    // }
-
-    const phoneRegex = /^\d{10}$/;
-    if (st.phone && !phoneRegex.test(st.phone)) {
-      this.notificationService.error('Phone number must be 10 digits.');
+    if (!st.cognitoSub || st.cognitoSub.trim() === '') {
+      this.notificationService.error('User identity (cognitoSub) is missing. Please log in again.');
       return false;
     }
 
-    // --- Change this block ---
-    if (!st.dateOfBirth) {
-      this.notificationService.error('Date of Birth is required.');
+    if (!st.email || st.email.trim() === '') {
+      this.notificationService.error('Email is required.');
       return false;
     }
 
-    // If it's a Date object, convert it to an ISO string snippet (YYYY-MM-DD) for regex checking
-    let dobStr = '';
-    if (st.dateOfBirth instanceof Date) {
-      // Check if it's an invalid date object
-      if (isNaN(st.dateOfBirth.getTime())) {
-        this.notificationService.error('Invalid Date of Birth.');
-        return false;
-      }
-      // Formats cleanly to YYYY-MM-DD safely handling timezone offsets
-      dobStr = st.dateOfBirth.toISOString().split('T')[0];
-    } else if (typeof st.dateOfBirth === 'string') {
-      dobStr = st.dateOfBirth.trim();
-      if (dobStr === '') {
-        this.notificationService.error('Date of Birth is required.');
-        return false;
-      }
-    } else {
-      this.notificationService.error('Invalid Date of Birth format.');
+    if (!st.firstName || st.firstName.trim() === '') {
+      this.notificationService.error('First name is required.');
       return false;
     }
 
-    const dobRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dobRegex.test(dobStr)) {
-      this.notificationService.error('Date of Birth must be in YYYY-MM-DD format.');
+    if (!st.companyId || st.companyId.trim() === '') {
+      this.notificationService.error('Company ID is required.');
       return false;
     }
-    // -------------------------
 
     if (!st.gender || st.gender.trim() === '') {
       this.notificationService.error('Gender is required.');
@@ -91,38 +59,24 @@ export class ObjectValidationService {
       return false;
     }
 
-    if (st.zip && !/^\d{6}$/.test(st.zip)) {
-      this.notificationService.error('ZIP code must be a 6-digit number.');
+    if (!st.dateOfBirth) {
+      this.notificationService.error('Date of Birth is required.');
       return false;
     }
 
-    if (!st.country || st.country.trim() === '') {
-      this.notificationService.error('Country is required.');
+    const dobRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dobRegex.test(st.dateOfBirth)) {
+      this.notificationService.error('Date of Birth must be in YYYY-MM-DD format.');
       return false;
     }
 
-    if (st.governmentIdType && st.governmentIdType.trim().length > 50) {
-      this.notificationService.error('Government ID Type must be less than 50 characters.');
+    if (st.age < 18) {
+      this.notificationService.error('You must be at least 18 years old to join.');
       return false;
     }
 
-    if (st.governmentIdNumber && st.governmentIdNumber.trim().length > 20) {
-      this.notificationService.error('Government ID Number must be less than 20 characters.');
-      return false;
-    }
-
-    if (st.address && st.address.trim() === '') {
-      this.notificationService.error('Address cannot be empty if provided.');
-      return false;
-    }
-
-    if (st.city && st.city.trim() === '') {
-      this.notificationService.error('City cannot be empty if provided.');
-      return false;
-    }
-
-    if (st.state && st.state.trim() === '') {
-      this.notificationService.error('State cannot be empty if provided.');
+    if (st.addressVO?.zip && !/^\d{5,10}$/.test(st.addressVO.zip)) {
+      this.notificationService.error('ZIP code must be between 5 and 10 digits.');
       return false;
     }
 

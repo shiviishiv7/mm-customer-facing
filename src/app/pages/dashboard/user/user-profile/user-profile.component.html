@@ -58,18 +58,17 @@
                 </mat-form-field>
               </div>
 
-              <!-- Phone -->
+              <!-- Company ID -->
               <div class="col-md-4">
                 <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Phone Number</mat-label>
-                  <input matInput type="text" name="phone" [(ngModel)]="user.phone" #phone="ngModel" maxlength="10" />
-                  <mat-error *ngIf="phone.invalid && phone.touched">Requires valid 10-digit contact structure.</mat-error>
+                  <mat-label>Company ID</mat-label>
+                  <input matInput type="text" name="companyId" [(ngModel)]="user.companyId" #companyId="ngModel" required />
+                  <mat-error *ngIf="companyId.invalid && companyId.touched">Company ID is required.</mat-error>
                 </mat-form-field>
               </div>
 
               <!-- Gender Selection -->
               <div class="col-md-4">
-                <!-- Update your mat-select options like this -->
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Gender Alignment</mat-label>
                   <mat-select name="gender" [(ngModel)]="user.gender" #gender="ngModel" required>
@@ -82,7 +81,7 @@
                 </mat-form-field>
               </div>
 
-              <!-- Date of Birth (Upgraded native binding picker syntax) -->
+              <!-- Date of Birth -->
               <div class="col-md-4">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Date of Birth</mat-label>
@@ -101,11 +100,11 @@
                 <hr class="mt-2 mb-1" style="border-color: #e2e8f0;"/>
               </div>
 
-              <!-- Address -->
+              <!-- Street Address -->
               <div class="col-md-12">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Street Address</mat-label>
-                  <textarea matInput name="address" [(ngModel)]="user.address" rows="2"></textarea>
+                  <textarea matInput name="streetAddress" [(ngModel)]="user.addressVO!.streetAddress" rows="2"></textarea>
                 </mat-form-field>
               </div>
 
@@ -113,7 +112,7 @@
               <div class="col-md-3 col-sm-6">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>City</mat-label>
-                  <input matInput type="text" name="city" [(ngModel)]="user.city"/>
+                  <input matInput type="text" name="city" [(ngModel)]="user.addressVO!.city"/>
                 </mat-form-field>
               </div>
 
@@ -121,15 +120,15 @@
               <div class="col-md-3 col-sm-6">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>State / Region</mat-label>
-                  <input matInput type="text" name="state" [(ngModel)]="user.state"/>
+                  <input matInput type="text" name="state" [(ngModel)]="user.addressVO!.state"/>
                 </mat-form-field>
               </div>
 
-              <!-- Country (FIXED: Swapped incorrect template duplicate name metadata attribute) -->
+              <!-- Country -->
               <div class="col-md-3 col-sm-6">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>Country</mat-label>
-                  <input matInput type="text" name="country" [(ngModel)]="user.country"/>
+                  <input matInput type="text" name="country" [(ngModel)]="user.addressVO!.country"/>
                 </mat-form-field>
               </div>
 
@@ -137,8 +136,8 @@
               <div class="col-md-3 col-sm-6">
                 <mat-form-field appearance="outline" class="w-100">
                   <mat-label>ZIP / Postal Code</mat-label>
-                  <input matInput type="text" name="zip" [(ngModel)]="user.zip" #zip="ngModel" maxlength="6" />
-                  <mat-error *ngIf="zip.invalid && zip.touched">Must be a valid 6-digit reference string.</mat-error>
+                  <input matInput type="text" name="zip" [(ngModel)]="user.addressVO!.zip" #zip="ngModel" maxlength="10" />
+                  <mat-error *ngIf="zip.invalid && zip.touched">Must be a valid ZIP / postal code.</mat-error>
                 </mat-form-field>
               </div>
 
@@ -175,17 +174,19 @@
                 </tr>
                 <tr>
                   <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Cognito Mapping Identity</th>
-                  <td class="text-muted font-monospace py-3" style="font-size: 0.85rem;">{{ user.sub }}</td>
+                  <td class="text-muted font-monospace py-3" style="font-size: 0.85rem;">{{ user.cognitoSub }}</td>
                 </tr>
                 <tr>
-                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Primary Workspace Contact</th>
-                  <td class="text-dark py-3">{{ user.phone || 'Not Configured' }}</td>
+                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Company ID</th>
+                  <td class="text-dark py-3">{{ user.companyId || 'Not Configured' }}</td>
                 </tr>
                 <tr>
                   <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Office Locality Bounds</th>
                   <td class="text-dark py-3">
-                    <span *ngIf="user.address">{{ user.address }}, </span>
-                    <span>{{ user.city }}</span><span *ngIf="user.state">, {{ user.state }}</span><span *ngIf="user.zip"> - {{ user.zip }}</span>
+                    <span *ngIf="user.addressVO?.streetAddress">{{ user.addressVO?.streetAddress }}, </span>
+                    <span>{{ user.addressVO?.city }}</span>
+                    <span *ngIf="user.addressVO?.state">, {{ user.addressVO?.state }}</span>
+                    <span *ngIf="user.addressVO?.zip"> - {{ user.addressVO?.zip }}</span>
                   </td>
                 </tr>
                 </tbody>

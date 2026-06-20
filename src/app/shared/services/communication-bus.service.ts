@@ -297,10 +297,13 @@ export class CommunicationBusService {
       }
       const user = new UserModel();
       const jwtPayload: Record<string, any> = jwtDecode(token);
-      user.name = jwtPayload.name;
-      user.sub = jwtPayload.sub;
+      const fullName: string = jwtPayload.name || '';
+      const nameParts = fullName.trim().split(' ');
+      user.firstName = nameParts[0] || '';
+      user.lastName = nameParts.slice(1).join(' ') || '';
+      user.cognitoSub = jwtPayload.sub;
       user.email = jwtPayload.email;
-      user.role = 'student';
+      user.addressVO = {};
 
       this.userService.createUser(user)
         .pipe(tap(v => this.success('✅ User created successfully')),

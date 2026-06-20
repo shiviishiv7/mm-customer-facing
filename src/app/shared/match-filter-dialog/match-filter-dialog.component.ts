@@ -89,7 +89,7 @@ export class MatchFilterDialogComponent implements OnInit {
     const filter: MatchFilter = {
       ...this.form.value,
       id: this.data?.existing?.id,
-      userId: this.data?.existing?.userId,
+      cognitoSub: this.data?.existing?.cognitoSub,
     };
 
     this.prefService.save(filter).subscribe({

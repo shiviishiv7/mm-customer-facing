@@ -9,7 +9,6 @@ export interface PoolUser {
   cognitoSub: string;
   firstName: string;
   lastName: string;
-  industry: string;
 }
 
 export interface WebRTCSignal {

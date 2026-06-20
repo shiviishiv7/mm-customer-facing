@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {UserModel} from '@core/models/class/user-model';
-import {finalize, Subscription, tap} from 'rxjs';
+import {finalize, Subscription} from 'rxjs';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '@core/services/user.service';
@@ -8,21 +8,20 @@ import {NotificationService} from '../../../../shared/services/notification.serv
 import {ObjectValidationService} from '@core/services/object-validation.service';
 import {CommunicationBusService} from '../../../../shared/services/communication-bus.service';
 import {NgForm} from '@angular/forms';
-import {signOut} from 'aws-amplify/auth';
 import {environment} from '../../../../../environments/environment';
+import {AuthService} from '@core/services/auth.service';
 
 @Component({
   selector: 'app-user-profile',
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
 })
-export class UserProfileComponent implements OnInit{
+export class UserProfileComponent implements OnInit {
 
   current = 1;
   user: UserModel;
   private subscriptions: Subscription = new Subscription();
   private sub: string | null = null;
-  private userId: number;
   private matDialogRef: MatDialogRef<any>;
   adminUser: boolean = false;
 
@@ -33,7 +32,8 @@ export class UserProfileComponent implements OnInit{
     private notificationService: NotificationService,
     private objectValidationService: ObjectValidationService,
     private route: ActivatedRoute,
-    private communicationBusService: CommunicationBusService
+    private communicationBusService: CommunicationBusService,
+    private authService: AuthService
   ) {
   }
 
@@ -41,6 +41,9 @@ export class UserProfileComponent implements OnInit{
     try {
       this.current = 2;
       this.user = new UserModel();
+      this.user.cognitoSub = this.authService.sub;
+      this.user.email = this.authService.email;
+      this.user.addressVO = {};
     } catch (error) {
       this.notificationService.error('An error occurred while initializing the user.');
     }
@@ -51,6 +54,20 @@ export class UserProfileComponent implements OnInit{
       if (!form.valid) {
         this.notificationService.error('Form is invalid. Please fix the errors and try again.');
         return;
+      }
+
+      // Compute age from dateOfBirth before sending to backend
+      if (this.user.dateOfBirth) {
+        const dob = new Date(this.user.dateOfBirth);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+          age--;
+        }
+        this.user.age = age;
+        // Normalize to YYYY-MM-DD string for backend
+        this.user.dateOfBirth = dob.toISOString().split('T')[0];
       }
 
       if (!this.objectValidationService.userValidate(this.user)) {
@@ -64,19 +81,15 @@ export class UserProfileComponent implements OnInit{
         : this.userService.createUser(this.user);
 
       userOperation
-        .pipe(
-          finalize(() => {
-            // Ensure progress bar is closed after completion
-            this.communicationBusService.closeProgressBar();
-          })
-        )
+        .pipe(finalize(() => this.communicationBusService.closeProgressBar()))
         .subscribe({
-          next: () => {
+          next: (res) => {
+            this.user = res.data ?? this.user;
             this.current = 3;
             this.notificationService.success('User data saved successfully!');
           },
           error: (err) => {
-            this.notificationService.error(err.message || 'An unexpected error occurred.');
+            this.notificationService.error(err.error?.message || err.message || 'An unexpected error occurred.');
           },
         });
     } catch (error) {
@@ -87,14 +100,12 @@ export class UserProfileComponent implements OnInit{
   }
 
   ngOnInit(): void {
-
     this.route.queryParamMap.subscribe((queryParams) => {
       this.sub = queryParams.get('sub');
       if (this.sub) {
         this.fetchUser(this.sub);
       }
     });
-
   }
 
   ngOnDestroy(): void {
@@ -104,7 +115,6 @@ export class UserProfileComponent implements OnInit{
       this.notificationService.error('An error occurred during cleanup.');
     }
   }
-
 
   private fetchUser(sub: string) {
     try {
@@ -120,36 +130,28 @@ export class UserProfileComponent implements OnInit{
               return;
             }
             this.user = data;
+            if (!this.user.addressVO) this.user.addressVO = {};
             this.current = 3;
           },
           error: (err) => {
-            if (err.message === 'User does not exist') {
+            if (err.status === 404 || err.error?.message === 'User does not exist') {
               this.communicationBusService.createUser();
             }
           }
-        })
-
+        });
     } catch (error) {
       this.notificationService.error('An unexpected error occurred during initialization.');
       this.communicationBusService.closeProgressBar();
     }
   }
 
-
-  private handleError(error, errorDisplayingTheProgressBar: string) {
-    this.notificationService.error(error.message, 'Dismiss')
-  }
-
   removeUserFromInstitution(user: UserModel) {
-
-    this.communicationBusService.routerNavigate("/dashboard/instant-match");
-
+    this.communicationBusService.routerNavigate('/dashboard/instant-match');
   }
 
   viewUserAttempt(user: UserModel) {
-    this.communicationBusService.routerNavigate("/dashboard/attempt-history");
+    this.communicationBusService.routerNavigate('/dashboard/attempt-history');
   }
-
 
   backToPreviousPage() {
     this.communicationBusService.backToPreviousPage();
@@ -157,4 +159,3 @@ export class UserProfileComponent implements OnInit{
 
   protected readonly environment = environment;
 }
-

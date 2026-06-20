@@ -5,7 +5,7 @@ import { environment } from '@environments/environment';
 
 export interface MatchFilter {
   id?: string;
-  userId?: string;
+  cognitoSub?: string;
   // Age
   minAge?: number;
   maxAge?: number;
