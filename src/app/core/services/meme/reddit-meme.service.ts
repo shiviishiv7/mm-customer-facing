@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '@environments/environment';
 
 export interface RedditMeme {
   title: string;
@@ -22,11 +23,11 @@ export interface MemeCategory {
 }
 
 export const MEME_CATEGORIES: MemeCategory[] = [
-  { id: 'general',    label: 'General',    emoji: '😂', subreddit: 'memes'          },
-  { id: 'dank',       label: 'Dank',       emoji: '🗿', subreddit: 'dankmemes'      },
-  { id: 'wholesome',  label: 'Wholesome',  emoji: '🥰', subreddit: 'wholesomememes' },
-  { id: 'relatable',  label: 'Relatable',  emoji: '💀', subreddit: 'me_irl'         },
-  { id: 'tech',       label: 'Tech',       emoji: '🤓', subreddit: 'ProgrammerHumor'},
+  { id: 'general',   label: 'General',   emoji: '😂', subreddit: 'memes'          },
+  { id: 'dank',      label: 'Dank',      emoji: '🗿', subreddit: 'dankmemes'      },
+  { id: 'wholesome', label: 'Wholesome', emoji: '🥰', subreddit: 'wholesomememes' },
+  { id: 'relatable', label: 'Relatable', emoji: '💀', subreddit: 'me_irl'         },
+  { id: 'tech',      label: 'Tech',      emoji: '🤓', subreddit: 'ProgrammerHumor'},
 ];
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
@@ -34,7 +35,9 @@ const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 @Injectable({ providedIn: 'root' })
 export class RedditMemeService {
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+  // All Reddit calls go through our backend proxy to avoid CORS / User-Agent blocks
+  private proxyBase = `${environment.apiUrl}/reddit`;
 
   async getMemes(
     subreddit: string,
@@ -42,47 +45,44 @@ export class RedditMemeService {
     time: MemeTime = 'day',
     limit = 50
   ): Promise<RedditMeme[]> {
-    const params = sort === 'top' ? `?t=${time}&limit=${limit}` : `?limit=${limit}`;
-    const url    = `https://www.reddit.com/r/${subreddit}/${sort}.json${params}`;
-
     const res: any = await firstValueFrom(
-      this.http.get(url, { headers: { Accept: 'application/json' } })
+      this.http.get(`${this.proxyBase}/memes`, {
+        params: { subreddit, sort, t: time, limit }
+      })
     );
 
     return (res?.data?.children ?? [])
       .map((c: any) => c.data)
       .filter((p: any) => this.isImagePost(p))
-      .map((p: any) => ({
-        title:     p.title,
-        url:       p.url,
-        thumbnail: p.thumbnail?.startsWith('http') ? p.thumbnail : p.url,
-        subreddit: p.subreddit,
-        permalink: `https://reddit.com${p.permalink}`,
-        score:     p.score,
-      }));
+      .map((p: any) => this.toMeme(p));
   }
 
   async getRandomMeme(subreddit = 'memes'): Promise<RedditMeme | null> {
-    // Reddit's /random endpoint returns a random post
-    const url = `https://www.reddit.com/r/${subreddit}/random.json`;
     try {
       const res: any = await firstValueFrom(
-        this.http.get(url, { headers: { Accept: 'application/json' } })
+        this.http.get(`${this.proxyBase}/random`, { params: { subreddit } })
       );
-      // random.json returns an array with the post listing at [0]
-      const post = res?.[0]?.data?.children?.[0]?.data;
+      // random.json returns an array — post data is at [0]
+      const post = Array.isArray(res)
+        ? res?.[0]?.data?.children?.[0]?.data
+        : res?.data?.children?.[0]?.data;
+
       if (!post || !this.isImagePost(post)) return this.getRandomMeme(subreddit);
-      return {
-        title:     post.title,
-        url:       post.url,
-        thumbnail: post.thumbnail?.startsWith('http') ? post.thumbnail : post.url,
-        subreddit: post.subreddit,
-        permalink: `https://reddit.com${post.permalink}`,
-        score:     post.score,
-      };
+      return this.toMeme(post);
     } catch {
       return null;
     }
+  }
+
+  private toMeme(post: any): RedditMeme {
+    return {
+      title:     post.title,
+      url:       post.url,
+      thumbnail: post.thumbnail?.startsWith('http') ? post.thumbnail : post.url,
+      subreddit: post.subreddit,
+      permalink: `https://reddit.com${post.permalink}`,
+      score:     post.score,
+    };
   }
 
   private isImagePost(post: any): boolean {
