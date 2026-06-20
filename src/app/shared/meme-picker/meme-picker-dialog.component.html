@@ -1,0 +1,79 @@
+<h2 mat-dialog-title>
+  <mat-icon style="vertical-align:middle;margin-right:6px">mood</mat-icon>
+  Pick a Meme
+</h2>
+
+<mat-dialog-content class="dialog-body">
+
+  <!-- ── Sort chips ───────────────────────────────────────────────────────── -->
+  <div class="sort-row">
+    <button *ngFor="let s of sortOptions"
+            class="sort-btn"
+            [class.active]="activeSort === s.value"
+            (click)="selectSort(s.value)">
+      {{ s.emoji }} {{ s.label }}
+    </button>
+
+    <button class="sort-btn random-btn"
+            [disabled]="loadingRandom"
+            (click)="randomMeme()"
+            matTooltip="Random meme from this category">
+      <mat-progress-spinner *ngIf="loadingRandom" mode="indeterminate" diameter="14" color="accent"></mat-progress-spinner>
+      <span *ngIf="!loadingRandom">🎲 Random</span>
+    </button>
+  </div>
+
+  <!-- ── Category tabs ────────────────────────────────────────────────────── -->
+  <mat-tab-group (selectedIndexChange)="selectCategory(categories[$event])" animationDuration="150ms">
+    <mat-tab *ngFor="let cat of categories" [label]="cat.emoji + ' ' + cat.label">
+
+      <!-- Preview selected meme -->
+      <div class="preview-wrap" *ngIf="preview">
+        <img [src]="preview.url" [alt]="preview.title" class="preview-img"
+             onerror="this.style.display='none'">
+        <p class="preview-title">{{ preview.title }}</p>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-wrap" *ngIf="loading">
+        <mat-progress-spinner mode="indeterminate" diameter="36" color="primary"></mat-progress-spinner>
+        <p>Loading memes…</p>
+      </div>
+
+      <!-- Error -->
+      <p class="error-msg" *ngIf="error && !loading">{{ error }}</p>
+
+      <!-- Meme grid -->
+      <div class="meme-grid" *ngIf="!loading && memes.length">
+        <div *ngFor="let m of memes"
+             class="meme-card"
+             [class.selected]="selected?.url === m.url"
+             (click)="pick(m)"
+             [matTooltip]="m.title">
+          <img [src]="m.thumbnail" [alt]="m.title" class="meme-thumb"
+               onerror="this.src='assets/icons/icon-96x96.png'">
+          <div class="meme-score">⬆ {{ m.score | number }}</div>
+        </div>
+      </div>
+
+      <p class="empty" *ngIf="!loading && !memes.length && !error">
+        No image posts found. Try a different sort.
+      </p>
+
+    </mat-tab>
+  </mat-tab-group>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="warn" (click)="noFilter()">
+    <mat-icon>videocam</mat-icon> No Filter
+  </button>
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-flat-button color="primary"
+          [disabled]="!selected || applying"
+          (click)="apply()">
+    <mat-progress-spinner *ngIf="applying" mode="indeterminate" diameter="16" color="accent" style="display:inline-block;margin-right:6px"></mat-progress-spinner>
+    {{ applying ? 'Applying…' : '✅ Apply Meme' }}
+  </button>
+</mat-dialog-actions>

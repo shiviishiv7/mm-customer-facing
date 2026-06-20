@@ -10,9 +10,9 @@
           <video #localVideo autoplay playsinline muted class="video-player"></video>
           <span class="label">You</span>
         </div>
-        <div class="filter-picker-wrap">
-          <app-avatar-picker></app-avatar-picker>
-        </div>
+        <button class="meme-btn-inline" (click)="openMemePicker()">
+          😂 {{ (memeStream.activeMeme$ | async) ? 'Change Meme' : 'Pick a Meme' }}
+        </button>
       </div>
       <div class="video-tile peer-tile">
         <video #remoteVideo autoplay playsinline class="video-player"

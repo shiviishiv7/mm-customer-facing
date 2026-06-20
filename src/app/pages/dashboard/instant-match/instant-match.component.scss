@@ -43,8 +43,19 @@
 
 .hidden { display: none; }
 
-.filter-picker-wrap {
-  margin-top: 0.5rem;
+.meme-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .status-bar {
@@ -83,6 +94,20 @@
     align-items: center;
     gap: 4px;
     &:hover { background: #1565c0; }
+  }
+
+  .meme-btn {
+    background: #ff6f00;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    &:hover { background: #e65100; }
   }
 }
 

@@ -18,12 +18,13 @@ import { ScheduledMatchService } from '@core/services/scheduled-match.service';
 import { WebRtcService } from '@core/services/web-rtc.service';
 import { MeetingService, UpcomingMeeting } from '@core/services/meeting.service';
 import { MatchFilterDialogComponent } from '@shared/match-filter-dialog/match-filter-dialog.component';
-import { AvatarPickerComponent } from '@shared/avatar-picker/avatar-picker.component';
+import { MemePickerDialogComponent } from '@shared/meme-picker/meme-picker-dialog.component';
+import { MemeStreamService } from '@core/services/meme/meme-stream.service';
 
 @Component({
   selector: 'app-scheduled-match',
   standalone: true,
-  imports: [NgIf, NgFor, AsyncPipe, DatePipe, MatIconModule, MatProgressSpinnerModule, MatButtonModule, MatTooltipModule, AvatarPickerComponent],
+  imports: [NgIf, NgFor, AsyncPipe, DatePipe, MatIconModule, MatProgressSpinnerModule, MatButtonModule, MatTooltipModule],
   templateUrl: './scheduled-match.component.html',
   styleUrl: './scheduled-match.component.scss'
 })
@@ -35,6 +36,7 @@ export class ScheduledMatchComponent implements OnInit, AfterViewInit, OnDestroy
   scheduledMatch  = inject(ScheduledMatchService);
   webRtc          = inject(WebRtcService);
   meetingService  = inject(MeetingService);
+  memeStream      = inject(MemeStreamService);
   private dialog  = inject(MatDialog);
 
   state$   = this.scheduledMatch.state$;
@@ -82,11 +84,11 @@ export class ScheduledMatchComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   openFilters(): void {
-    this.dialog.open(MatchFilterDialogComponent, {
-      width: '520px',
-      maxWidth: '95vw',
-      data: { mode: 'scheduled' }
-    });
+    this.dialog.open(MatchFilterDialogComponent, { width: '520px', maxWidth: '95vw', data: { mode: 'scheduled' } });
+  }
+
+  openMemePicker(): void {
+    this.dialog.open(MemePickerDialogComponent, { width: '680px', maxWidth: '95vw', maxHeight: '90vh' });
   }
 
   endCall(): void {

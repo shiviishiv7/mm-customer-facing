@@ -2,7 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, ReplaySubject, Subject, Subscription } from 'rxjs';
 import { WebSocketConnectionService } from './web-socket-connection.service';
 import { AuthService } from './auth.service';
-import { AvatarService } from './avatar/avatar.service';
+import { MemeStreamService } from './meme/meme-stream.service';
 import { environment } from '@environments/environment';
 
 export interface PoolUser {
@@ -24,7 +24,7 @@ export class WebRtcService implements OnDestroy {
 
   private stomp        = inject(WebSocketConnectionService);
   private auth         = inject(AuthService);
-  private avatarService = inject(AvatarService);
+  private memeStream = inject(MemeStreamService);
 
   // ── State ──────────────────────────────────────────────────────────────────
   private peerConnection!: RTCPeerConnection;
@@ -259,9 +259,9 @@ export class WebRtcService implements OnDestroy {
     if (this.localStream) return; // already running
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      const filtered = await this.avatarService.start(this.localStream);
+      const filtered = this.memeStream.start(this.localStream);
       this._localStream$.next(filtered);
-      console.log('[WebRTC] Local camera started (waiting room, avatar)');
+      console.log('[WebRTC] Local camera started (waiting room, meme pipeline)');
     } catch (err) {
       console.error('[WebRTC] Failed to start local camera:', err);
     }
@@ -273,11 +273,11 @@ export class WebRtcService implements OnDestroy {
     // Capture raw camera/mic
     this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
-    // Run the raw stream through AvatarService → Three.js canvas pipeline.
-    // The avatar stream is what the local preview shows AND what gets sent to the peer.
-    const filteredStream = await this.avatarService.start(this.localStream);
+    // Run the raw stream through MemeStreamService → canvas pipeline.
+    // Draws either raw camera or a meme image onto a canvas at 30fps.
+    const filteredStream = this.memeStream.start(this.localStream);
     this._localStream$.next(filteredStream);
-    console.log('[WebRTC] Local stream ready (avatar)');
+    console.log('[WebRTC] Local stream ready (meme pipeline)');
 
     // Fetch fresh ICE servers (STUN + TURN) from Metered.ca API
     const iceServers = await this.fetchIceServers();
@@ -362,7 +362,7 @@ export class WebRtcService implements OnDestroy {
   }
 
   private cleanupPeerConnection(): void {
-    this.avatarService.stop();
+    this.memeStream.stop();
     this.dataChannel?.close();
     this.dataChannel = null;
     this.peerConnection?.close();

@@ -6,10 +6,10 @@
       <div class="video-tile">
         <video #localVideo autoplay playsinline muted class="video-player"></video>
         <span class="label">You</span>
-      </div>
-      <!-- Face-filter picker lives under the local video tile -->
-      <div class="filter-picker-wrap" [class.hidden]="(callStatus$ | async) === 'idle'">
-        <app-avatar-picker></app-avatar-picker>
+        <!-- Meme indicator badge on the tile -->
+        <div class="meme-badge" *ngIf="activeMeme$ | async as meme">
+          😂 {{ meme.title | slice:0:30 }}…
+        </div>
       </div>
     </div>
     <div class="col-md-6">
@@ -39,7 +39,7 @@
         Status: <strong>{{ callStatus$ | async }}</strong>
       </div>
 
-      <!-- In-call controls: End + Next + Filter -->
+      <!-- In-call controls -->
       <div class="call-controls" [class.hidden]="(callStatus$ | async) === 'idle'">
         <button class="end-call-btn" (click)="endCall()">
           <mat-icon style="font-size:1rem;height:1rem;width:1rem;vertical-align:middle">call_end</mat-icon>
@@ -49,13 +49,17 @@
           <mat-icon style="font-size:1rem;height:1rem;width:1rem">skip_next</mat-icon>
           Next
         </button>
+        <!-- Meme button — always visible during a call -->
+        <button class="meme-btn" (click)="openMemePicker()" matTooltip="Pick a meme to show instead of your camera">
+          😂 {{ (activeMeme$ | async) ? 'Change Meme' : 'Meme' }}
+        </button>
         <button mat-stroked-button color="primary" (click)="openFilters()">
           <mat-icon>tune</mat-icon>
           Filter
         </button>
       </div>
 
-      <!-- Chat panel — visible during an active call -->
+      <!-- Chat panel -->
       <div class="chat-panel" [class.hidden]="(callStatus$ | async) === 'idle'">
         <div class="chat-header">
           <mat-icon style="font-size:1rem;height:1rem;width:1rem">chat</mat-icon>
@@ -74,8 +78,7 @@
         </div>
         <div class="chat-input-row">
           <input #chatInput type="text" placeholder="Type a message…"
-                 (keyup.enter)="sendChat(chatInput)"
-                 maxlength="500">
+                 (keyup.enter)="sendChat(chatInput)" maxlength="500">
           <button (click)="sendChat(chatInput)">
             <mat-icon style="font-size:1.1rem;height:1.1rem;width:1.1rem">send</mat-icon>
           </button>
