@@ -2,30 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
+import {MatchFilter} from '@core/models/interface/some-interface';
 
-export interface MatchFilter {
-  id?: string;
-  cognitoSub?: string;
-  // Age
-  minAge?: number;
-  maxAge?: number;
-  // Gender
-  preferredGender?: 'MALE' | 'FEMALE' | 'OTHER' | null;
-  // Industry
-  preferredIndustries?: string[];
-  // Company
-  sameCompanyAllowed?: boolean;
-  preferredCompany?: string;
-  // Education
-  preferredCollege?: string;
-  // Location
-  preferredZip?: string;
-  preferredCity?: string;
-  preferredState?: string;
-  preferredCountry?: string;
-  // Timezone
-  maxTimezoneOffsetHours?: number;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class UserPreferenceService {

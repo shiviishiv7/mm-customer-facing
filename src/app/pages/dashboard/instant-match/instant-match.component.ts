@@ -62,7 +62,7 @@ export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openFilters(): void {
-    this.dialog.open(MatchFilterDialogComponent, { width: '520px', maxWidth: '95vw', data: { mode: 'instant' } });
+    this.dialog.open(MatchFilterDialogComponent, { width: '820px', maxWidth: '95vw', data: { mode: 'instant' } });
   }
 
   openMemePicker(): void {
