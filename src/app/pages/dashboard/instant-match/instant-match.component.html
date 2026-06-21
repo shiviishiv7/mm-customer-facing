@@ -2,103 +2,107 @@
 
   <!-- ── Video grid ──────────────────────────────────────────────────────── -->
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-9">
       <div class="video-tile">
-        <video #localVideo autoplay playsinline muted class="video-player"></video>
-        <span class="label">You</span>
+        <video #remoteVideo autoplay playsinline class="video-player"></video>
+        <span class="label">Other User</span>
         <!-- Meme indicator badge on the tile -->
         <div class="meme-badge" *ngIf="activeMeme$ | async as meme">
           😂 {{ meme.title | slice:0:30 }}…
         </div>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="video-tile">
-        <video #remoteVideo autoplay playsinline class="video-player"></video>
-        <span class="label">Other User</span>
+    <div class="col-md-3">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="video-tile">
+            <video #localVideo autoplay playsinline muted class="video-player"></video>
+            <span class="label">You</span>
+          </div>
+          <!-- ── Controls ────────────────────────────────────────────────────────── -->
+          <div class="row mt-3">
+            <div class="instant-match">
+
+              <!-- Header -->
+<!--              <div class="header-row">-->
+<!--                <h3 class="screen-title">Instant Connect</h3>-->
+<!--                <button mat-stroked-button color="primary" (click)="openFilters()"-->
+<!--                        matTooltip="Set match preferences">-->
+<!--                  <mat-icon>tune</mat-icon>-->
+<!--                  Filters-->
+<!--                </button>-->
+<!--              </div>-->
+
+              <!-- Status bar -->
+              <div class="status-bar">
+                Status: <strong>{{ callStatus$ | async }}</strong>
+              </div>
+
+              <!-- In-call controls -->
+              <div class="call-controls" [class.hidden]="(callStatus$ | async) === 'idle'">
+                <!--        <button class="end-call-btn" (click)="endCall()">-->
+                <!--          <mat-icon style="font-size:1rem;height:1rem;width:1rem;vertical-align:middle">call_end</mat-icon>-->
+                <!--          End-->
+                <!--        </button>-->
+                <button class="next-btn" (click)="nextUser()">
+                  <mat-icon style="font-size:1rem;height:1rem;width:1rem">skip_next</mat-icon>
+                  Next
+                </button>
+                <!-- Meme button — always visible during a call -->
+                <button class="meme-btn" (click)="openMemePicker()" matTooltip="Pick a meme to show instead of your camera">
+                  😂 {{ (activeMeme$ | async) ? 'Change Meme' : 'Meme' }}
+                </button>
+                <!--        <button mat-stroked-button color="primary" (click)="openFilters()">-->
+                <!--          <mat-icon>tune</mat-icon>-->
+                <!--          Filter-->
+                <!--        </button>-->
+              </div>
+
+              <!-- Chat panel -->
+              <div class="chat-panel" [class.hidden]="(callStatus$ | async) === 'idle'">
+                <div class="chat-header">
+                  <mat-icon style="font-size:1rem;height:1rem;width:1rem">chat</mat-icon>
+                  Chat
+                </div>
+                <div class="chat-messages" #chatScroll>
+                  <ng-container *ngIf="(chatMessages$ | async)?.length === 0">
+                    <p class="chat-empty">No messages yet. Say hi!</p>
+                  </ng-container>
+                  <div *ngFor="let msg of chatMessages$ | async"
+                       class="chat-bubble"
+                       [class.mine]="msg.sentByMe"
+                       [class.theirs]="!msg.sentByMe">
+                    {{ msg.message }}
+                  </div>
+                </div>
+                <div class="chat-input-row">
+                  <input #chatInput type="text" placeholder="Type a message…"
+                         (keyup.enter)="sendChat(chatInput)" maxlength="500">
+                  <button (click)="sendChat(chatInput)">
+                    <mat-icon style="font-size:1.1rem;height:1.1rem;width:1.1rem">send</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Available Users Pool -->
+              <div class="pool-section" [class.hidden]="(callStatus$ | async) !== 'idle'">
+                <p *ngIf="(poolUsers$ | async)?.length === 0" class="empty-state">
+                  No users available right now. Adjust your filters or check back soon.
+                </p>
+                <div class="user-card" *ngFor="let user of poolUsers$ | async">
+                  <div class="user-info">
+                    <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+                    <span class="industry">{{ user.industry }}</span>
+                  </div>
+                  <button mat-flat-button color="primary" (click)="connect(user)">Connect</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ── Controls ────────────────────────────────────────────────────────── -->
-  <div class="row mt-3">
-    <div class="instant-match">
-
-      <!-- Header -->
-      <div class="header-row">
-        <h3 class="screen-title">Instant Connect</h3>
-        <button mat-stroked-button color="primary" (click)="openFilters()"
-                matTooltip="Set match preferences">
-          <mat-icon>tune</mat-icon>
-          Filters
-        </button>
-      </div>
-
-      <!-- Status bar -->
-      <div class="status-bar">
-        Status: <strong>{{ callStatus$ | async }}</strong>
-      </div>
-
-      <!-- In-call controls -->
-      <div class="call-controls" [class.hidden]="(callStatus$ | async) === 'idle'">
-        <button class="end-call-btn" (click)="endCall()">
-          <mat-icon style="font-size:1rem;height:1rem;width:1rem;vertical-align:middle">call_end</mat-icon>
-          End
-        </button>
-        <button class="next-btn" (click)="nextUser()">
-          <mat-icon style="font-size:1rem;height:1rem;width:1rem">skip_next</mat-icon>
-          Next
-        </button>
-        <!-- Meme button — always visible during a call -->
-        <button class="meme-btn" (click)="openMemePicker()" matTooltip="Pick a meme to show instead of your camera">
-          😂 {{ (activeMeme$ | async) ? 'Change Meme' : 'Meme' }}
-        </button>
-        <button mat-stroked-button color="primary" (click)="openFilters()">
-          <mat-icon>tune</mat-icon>
-          Filter
-        </button>
-      </div>
-
-      <!-- Chat panel -->
-      <div class="chat-panel" [class.hidden]="(callStatus$ | async) === 'idle'">
-        <div class="chat-header">
-          <mat-icon style="font-size:1rem;height:1rem;width:1rem">chat</mat-icon>
-          Chat
-        </div>
-        <div class="chat-messages" #chatScroll>
-          <ng-container *ngIf="(chatMessages$ | async)?.length === 0">
-            <p class="chat-empty">No messages yet. Say hi!</p>
-          </ng-container>
-          <div *ngFor="let msg of chatMessages$ | async"
-               class="chat-bubble"
-               [class.mine]="msg.sentByMe"
-               [class.theirs]="!msg.sentByMe">
-            {{ msg.message }}
-          </div>
-        </div>
-        <div class="chat-input-row">
-          <input #chatInput type="text" placeholder="Type a message…"
-                 (keyup.enter)="sendChat(chatInput)" maxlength="500">
-          <button (click)="sendChat(chatInput)">
-            <mat-icon style="font-size:1.1rem;height:1.1rem;width:1.1rem">send</mat-icon>
-          </button>
-        </div>
-      </div>
-
-      <!-- Available Users Pool -->
-      <div class="pool-section" [class.hidden]="(callStatus$ | async) !== 'idle'">
-        <p *ngIf="(poolUsers$ | async)?.length === 0" class="empty-state">
-          No users available right now. Adjust your filters or check back soon.
-        </p>
-        <div class="user-card" *ngFor="let user of poolUsers$ | async">
-          <div class="user-info">
-            <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
-            <span class="industry">{{ user.industry }}</span>
-          </div>
-          <button mat-flat-button color="primary" (click)="connect(user)">Connect</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
 </div>
