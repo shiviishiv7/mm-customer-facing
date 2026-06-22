@@ -11,7 +11,7 @@ import {UserModel} from '../models/class/user-model';
 })
 export class UserService {
   private baseURL: string = environment.apiUrl;
-  private pathURL: string = '/user'; // Set a default value
+  private pathURL: string = '/base-user-profile'; // Set a default value
 
   constructor(private http: HttpClient) {
     //console.log(this.baseURL);
