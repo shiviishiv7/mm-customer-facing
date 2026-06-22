@@ -25,7 +25,7 @@ export interface FilterChip {
 }
 
 export interface MatchFilter {
-  id?: string;
+  id?: number;
   cognitoSub?: string;
 
   // Base filters

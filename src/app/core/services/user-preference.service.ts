@@ -18,8 +18,6 @@ export class UserPreferenceService {
   }
 
   save(filter: MatchFilter): Observable<any> {
-    // Use update if id present, add otherwise
-    const endpoint = filter.id ? `${this.base}/update` : `${this.base}/add`;
-    return this.http.post(endpoint, filter);
+    return this.http.post(`${this.base}/save`, filter);
   }
 }
