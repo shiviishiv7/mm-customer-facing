@@ -5,6 +5,7 @@ import {UserProfileComponent} from './user/user-profile/user-profile.component';
 import {InstantMatchComponent} from './instant-match/instant-match.component';
 import {ScheduledMatchComponent} from './scheduled-match/scheduled-match.component';
 import {HomeComponent} from './home/home.component';
+import {ParseMatchComponent} from './parse-match/parse-match.component';
 
 
 const routes: Routes = [
@@ -35,6 +36,11 @@ const routes: Routes = [
       {
         path: 'scheduled-match',
         component: ScheduledMatchComponent,
+        pathMatch: 'full',
+      },
+      {
+        path: 'parser-match',
+        component: ParseMatchComponent,
         pathMatch: 'full',
       },
       {
