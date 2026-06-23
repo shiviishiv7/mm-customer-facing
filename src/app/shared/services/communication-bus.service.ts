@@ -288,30 +288,7 @@ export class CommunicationBusService {
   // }
 
 
-  public async createUser(): Promise<void> {
-    try {
-      const token = this.authService.getToken();
-      if (!token) {
-        console.error('❌ No token found. Cannot create user.');
-        return;
-      }
-      const user = new UserModel();
-      const jwtPayload: Record<string, any> = jwtDecode(token);
-      const fullName: string = jwtPayload.name || '';
-      const nameParts = fullName.trim().split(' ');
-      user.firstName = nameParts[0] || '';
-      user.lastName = nameParts.slice(1).join(' ') || '';
-      user.cognitoSub = jwtPayload.sub;
-      user.email = jwtPayload.email;
-      user.addressVO = {};
-
-      this.userService.createUser(user)
-        .pipe(tap(v => this.success('✅ User created successfully')),
-          catchError(err => of())).subscribe()
-    } catch (error) {
-      console.error('❌ Error in createUser:', error);
-    }
-  }
+  // createUser removed — user creation is handled by AWS Lambda post-Cognito signup
 
   public async checkCurrentUser(): Promise<void> {
     try {

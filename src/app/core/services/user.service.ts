@@ -17,9 +17,7 @@ export class UserService {
     //console.log(this.baseURL);
   }
 
-  createUser(user: UserModel): Observable<BaseVO<UserModel>> {
-    return this.http.post<BaseVO<UserModel>>(`${this.baseURL}${this.pathURL}/add`, user);
-  }
+  // createUser removed — user creation is handled by AWS Lambda post-Cognito signup
 
   updateUser(user: UserModel): Observable<BaseVO<UserModel>> {
     return this.http.post<BaseVO<UserModel>>(`${this.baseURL}${this.pathURL}/update`, user);
@@ -29,12 +27,12 @@ export class UserService {
     return this.http.get<BaseVO<Array<UserModel>>>(`${this.baseURL}${this.pathURL}/all`);
   }
 
-  fetchUserByEmail(sub: string): Observable<BaseVO<UserModel>> {
-    return this.http.get<BaseVO<UserModel>>(`${this.baseURL}${this.pathURL}/by-email/${sub}`);
+  fetchUserByEmail(email: string): Observable<BaseVO<UserModel>> {
+    return this.http.get<BaseVO<UserModel>>(`${this.baseURL}${this.pathURL}/by-email/${email}`);
   }
 
-  fetchUserById(userId: number): Observable<BaseVO<UserModel>> {
-    return this.http.get<BaseVO<UserModel>>(`${this.baseURL}${this.pathURL}/${userId}`);
+  fetchUserByCognitoSub(cognitoSub: string): Observable<BaseVO<UserModel>> {
+    return this.http.get<BaseVO<UserModel>>(`${this.baseURL}${this.pathURL}/${cognitoSub}`);
   }
 
   removeUserFromInstitution(sub: string = '') {

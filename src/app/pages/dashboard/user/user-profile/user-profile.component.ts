@@ -37,17 +37,7 @@ export class UserProfileComponent implements OnInit {
   ) {
   }
 
-  createUser(): void {
-    try {
-      this.current = 2;
-      this.user = new UserModel();
-      this.user.cognitoSub = this.authService.sub;
-      this.user.email = this.authService.email;
-      this.user.addressVO = {};
-    } catch (error) {
-      this.notificationService.error('An error occurred while initializing the user.');
-    }
-  }
+  // createUser removed — user creation is handled by AWS Lambda post-Cognito signup
 
   submitForm(form: NgForm): void {
     try {
@@ -76,11 +66,8 @@ export class UserProfileComponent implements OnInit {
 
       this.communicationBusService.showProgressBar();
 
-      const userOperation = this.user.id
-        ? this.userService.updateUser(this.user)
-        : this.userService.createUser(this.user);
-
-      userOperation
+      // Always update — user record is created by AWS Lambda on Cognito signup
+      this.userService.updateUser(this.user)
         .pipe(finalize(() => this.communicationBusService.closeProgressBar()))
         .subscribe({
           next: (res) => {
@@ -134,8 +121,11 @@ export class UserProfileComponent implements OnInit {
             this.current = 3;
           },
           error: (err) => {
+            // User not found means Lambda post-signup hook hasn't run yet or failed
             if (err.status === 404 || err.error?.message === 'User does not exist') {
-              this.communicationBusService.createUser();
+              this.notificationService.error('Your profile is not set up yet. Please contact support.');
+            } else {
+              this.notificationService.error(err.error?.message || 'Failed to load profile.');
             }
           }
         });
