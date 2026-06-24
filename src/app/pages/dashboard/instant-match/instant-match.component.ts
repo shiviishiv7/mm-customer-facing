@@ -3,22 +3,27 @@ import {
   OnDestroy, OnInit, ViewChild
 } from '@angular/core';
 import { AsyncPipe, NgIf, SlicePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { Subscription } from 'rxjs';
-import { PoolUser, WebRtcService } from '@core/services/web-rtc.service';
+import { InstantSearchFilter, PoolUser, WebRtcService } from '@core/services/web-rtc.service';
 import { ChatService } from '@core/services/chat.service';
 import { AuthService } from '@core/services/auth.service';
 import { MemeStreamService } from '@core/services/meme/meme-stream.service';
-import { MatchFilterDialogComponent } from '@shared/match-filter-dialog/match-filter-dialog.component';
 import { MemePickerDialogComponent } from '@shared/meme-picker/meme-picker-dialog.component';
 
 @Component({
   selector: 'app-instant-match',
   standalone: true,
-  imports: [NgIf, AsyncPipe, SlicePipe, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [NgIf, AsyncPipe, SlicePipe, FormsModule,
+            MatButtonModule, MatIconModule, MatTooltipModule,
+            MatSelectModule, MatInputModule, MatFormFieldModule],
   templateUrl: './instant-match.component.html',
   styleUrl: './instant-match.component.scss'
 })
@@ -28,16 +33,20 @@ export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('remoteVideo', { static: true }) remoteVideoRef!: ElementRef<HTMLVideoElement>;
   @ViewChild('chatScroll')  chatScrollRef?: ElementRef<HTMLDivElement>;
 
-  webRtc      = inject(WebRtcService);
-  chat        = inject(ChatService);
-  auth        = inject(AuthService);
-  memeStream  = inject(MemeStreamService);
+  webRtc     = inject(WebRtcService);
+  chat       = inject(ChatService);
+  auth       = inject(AuthService);
+  memeStream = inject(MemeStreamService);
   private dialog = inject(MatDialog);
 
-  currentUser$  = this.webRtc.currentUser$;
-  callStatus$   = this.webRtc.callStatus$;
-  chatMessages$ = this.chat.messages$;
-  activeMeme$   = this.memeStream.activeMeme$;
+  currentUser$     = this.webRtc.currentUser$;
+  callStatus$      = this.webRtc.callStatus$;
+  waitingForMatch$ = this.webRtc.waitingForMatch$;
+  chatMessages$    = this.chat.messages$;
+  activeMeme$      = this.memeStream.activeMeme$;
+
+  showFilterPanel = false;
+  filter: InstantSearchFilter = {};
 
   private currentPeerSub: string | null = null;
   private statusSub!: Subscription;
@@ -61,8 +70,19 @@ export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  openFilters(): void {
-    this.dialog.open(MatchFilterDialogComponent, { width: '820px', maxWidth: '95vw', data: { mode: 'instant' } });
+  toggleFilterPanel(): void {
+    this.showFilterPanel = !this.showFilterPanel;
+  }
+
+  applyFilter(): void {
+    this.showFilterPanel = false;
+    this.webRtc.searchPool(this.filter);
+  }
+
+  clearFilter(): void {
+    this.filter = {};
+    this.showFilterPanel = false;
+    this.webRtc.joinPool();
   }
 
   openMemePicker(): void {

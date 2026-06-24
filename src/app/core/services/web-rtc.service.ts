@@ -11,11 +11,19 @@ export interface PoolUser {
   lastName: string;
 }
 
+export interface InstantSearchFilter {
+  childCategory?: string;   // presence switches to advanced search
+  preferredGender?: string;
+  preferredCity?: string;
+  minAge?: number;
+  maxAge?: number;
+}
+
 export interface WebRTCSignal {
-  type: 'POOL_LIST' | 'CONNECTION_REQUEST' | 'OFFER' | 'ANSWER' | 'ICE_CANDIDATE' | 'PEER_LEFT' | 'BUSY';
+  type: 'POOL_LIST' | 'CONNECTION_REQUEST' | 'OFFER' | 'ANSWER' | 'ICE_CANDIDATE' | 'PEER_LEFT' | 'BUSY' | 'NO_MATCH_NOW' | 'MATCH_FOUND';
   fromUserId: string;
   toUserId: string;
-  payload: string;  // SDP string or ICE candidate JSON
+  payload: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -37,8 +45,10 @@ export class WebRtcService implements OnDestroy {
   private _localStream$  = new ReplaySubject<MediaStream>(1);  // emits when local camera is ready
   private _callStatus$   = new BehaviorSubject<string>('idle');
   private _dataChannel$  = new Subject<MessageEvent>();   // emits raw DataChannel messages
+  private _waitingForMatch$ = new BehaviorSubject<boolean>(false); // true after NO_MATCH_NOW until match arrives
 
-  public currentUser$  = this._currentUser$.asObservable();
+  public currentUser$      = this._currentUser$.asObservable();
+  public waitingForMatch$  = this._waitingForMatch$.asObservable();
   public remoteStream$ = this._remoteStream$.asObservable();
   public localStream$  = this._localStream$.asObservable();
   public callStatus$   = this._callStatus$.asObservable();
@@ -164,6 +174,16 @@ export class WebRtcService implements OnDestroy {
     console.log('[WebRTC] Reported busy to:', callerSub);
   }
 
+  /**
+   * Send a filter search request to the server.
+   * childCategory present → advanced search; absent → basic search.
+   * Server responds with a pool list (if matches found) or NO_MATCH_NOW signal.
+   */
+  searchPool(filter: InstantSearchFilter): void {
+    this.stomp.publish('/app/webrtc.search', filter);
+    console.log('[WebRTC] Filter search sent:', filter);
+  }
+
   // ── Step 3: Caller creates and sends SDP Offer ────────────────────────────
 
   async createAndSendOffer(targetSub: string): Promise<void> {
@@ -245,7 +265,18 @@ export class WebRtcService implements OnDestroy {
         if (Array.isArray(data)) {
           this.userQueue = data as PoolUser[];
           this._currentUser$.next(this.userQueue[0] ?? null);
+          this._waitingForMatch$.next(false);
           console.log('[WebRTC] Pool list received:', this.userQueue.length, 'users');
+          return;
+        }
+
+        // Single PoolUser pushed from server (MATCH_FOUND for pending filter request)
+        if (data && typeof data === 'object' && 'cognitoSub' in data && !('type' in data)) {
+          const matched = data as PoolUser;
+          this.userQueue = [matched];
+          this._currentUser$.next(matched);
+          this._waitingForMatch$.next(false);
+          console.log('[WebRTC] Match found for pending request:', matched.cognitoSub);
           return;
         }
 
@@ -289,6 +320,20 @@ export class WebRtcService implements OnDestroy {
             console.log('[WebRTC] User busy:', signal.fromUserId, '— moving to next');
             this._callStatus$.next('idle');
             this.advanceQueue();
+            break;
+
+          // No pool users matched the filter — waiting for a future joiner
+          case 'NO_MATCH_NOW':
+            console.log('[WebRTC] No match now — waiting for a compatible user to join');
+            this._waitingForMatch$.next(true);
+            break;
+
+          // A compatible user joined the pool while we had a pending filter request
+          case 'MATCH_FOUND':
+            console.log('[WebRTC] Match found for pending filter request');
+            this._waitingForMatch$.next(false);
+            // data arrives as a PoolUser object (not wrapped in WebRTCSignal)
+            // handled by the Array.isArray branch above; this case is a safety fallback
             break;
 
           // Other peer left or ended call

@@ -86,19 +86,77 @@
 
               <!-- Available Users Pool — shown one at a time -->
               <div class="pool-section" [class.hidden]="(callStatus$ | async) !== 'idle'">
-                <ng-container *ngIf="currentUser$ | async as user; else noUsers">
-                  <div class="user-card">
-                    <div class="user-info">
-                      <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+
+                <!-- Filter toggle button -->
+                <div class="filter-row">
+                  <button mat-stroked-button (click)="toggleFilterPanel()">
+                    <mat-icon style="font-size:1rem;height:1rem;width:1rem">tune</mat-icon>
+                    Filter Search
+                  </button>
+                  <button mat-stroked-button (click)="clearFilter()" *ngIf="showFilterPanel">
+                    Clear
+                  </button>
+                </div>
+
+                <!-- Inline filter panel -->
+                <div class="filter-panel" *ngIf="showFilterPanel">
+                  <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Gender</mat-label>
+                    <mat-select [(ngModel)]="filter.preferredGender">
+                      <mat-option value="">Any</mat-option>
+                      <mat-option value="MALE">Male</mat-option>
+                      <mat-option value="FEMALE">Female</mat-option>
+                      <mat-option value="NON_BINARY">Non-binary</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>City</mat-label>
+                    <input matInput [(ngModel)]="filter.preferredCity" placeholder="e.g. Mumbai">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Min Age</mat-label>
+                    <input matInput type="number" [(ngModel)]="filter.minAge" placeholder="18">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Max Age</mat-label>
+                    <input matInput type="number" [(ngModel)]="filter.maxAge" placeholder="50">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Category (optional — enables advanced search)</mat-label>
+                    <input matInput [(ngModel)]="filter.childCategory" placeholder="e.g. MENTORSHIP">
+                  </mat-form-field>
+
+                  <button mat-flat-button color="primary" (click)="applyFilter()">Search</button>
+                </div>
+
+                <!-- Waiting for a future match (no instant match found) -->
+                <div class="waiting-state" *ngIf="waitingForMatch$ | async">
+                  <mat-icon>hourglass_top</mat-icon>
+                  <p>No one matches your filters right now.</p>
+                  <p>You'll be notified automatically when a compatible user joins.</p>
+                </div>
+
+                <!-- Current user card -->
+                <ng-container *ngIf="!(waitingForMatch$ | async)">
+                  <ng-container *ngIf="currentUser$ | async as user; else noUsers">
+                    <div class="user-card">
+                      <div class="user-info">
+                        <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+                      </div>
+                      <button mat-flat-button color="primary" (click)="connect(user)">Connect</button>
                     </div>
-                    <button mat-flat-button color="primary" (click)="connect(user)">Connect</button>
-                  </div>
+                  </ng-container>
+                  <ng-template #noUsers>
+                    <p class="empty-state">
+                      No users available right now. Try a filter search or check back soon.
+                    </p>
+                  </ng-template>
                 </ng-container>
-                <ng-template #noUsers>
-                  <p class="empty-state">
-                    No users available right now. Adjust your filters or check back soon.
-                  </p>
-                </ng-template>
+
               </div>
 
             </div>
