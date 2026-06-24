@@ -16,6 +16,7 @@ import { InstantSearchFilter, PoolUser, WebRtcService } from '@core/services/web
 import { ChatService } from '@core/services/chat.service';
 import { AuthService } from '@core/services/auth.service';
 import { MemeStreamService } from '@core/services/meme/meme-stream.service';
+import { UserPreferenceService } from '@core/services/user-preference.service';
 import { MemePickerDialogComponent } from '@shared/meme-picker/meme-picker-dialog.component';
 
 @Component({
@@ -33,11 +34,12 @@ export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('remoteVideo', { static: true }) remoteVideoRef!: ElementRef<HTMLVideoElement>;
   @ViewChild('chatScroll')  chatScrollRef?: ElementRef<HTMLDivElement>;
 
-  webRtc     = inject(WebRtcService);
-  chat       = inject(ChatService);
-  auth       = inject(AuthService);
-  memeStream = inject(MemeStreamService);
-  private dialog = inject(MatDialog);
+  webRtc      = inject(WebRtcService);
+  chat        = inject(ChatService);
+  auth        = inject(AuthService);
+  memeStream  = inject(MemeStreamService);
+  private prefService = inject(UserPreferenceService);
+  private dialog      = inject(MatDialog);
 
   currentUser$     = this.webRtc.currentUser$;
   callStatus$      = this.webRtc.callStatus$;
@@ -77,6 +79,17 @@ export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
   applyFilter(): void {
     this.showFilterPanel = false;
     this.webRtc.searchPool(this.filter);
+
+    // Persist filter as a match preference if childCategory is set (advanced search)
+    if (this.filter.childCategory) {
+      this.prefService.save({
+        childCategory: this.filter.childCategory,
+        preferredGender: this.filter.preferredGender,
+        preferredCity: this.filter.preferredCity,
+        minAge: this.filter.minAge,
+        maxAge: this.filter.maxAge,
+      } as any).subscribe({ error: () => {} });
+    }
   }
 
   clearFilter(): void {

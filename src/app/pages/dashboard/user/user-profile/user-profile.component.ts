@@ -106,7 +106,7 @@ export class UserProfileComponent implements OnInit {
   private fetchUser(sub: string) {
     try {
       this.communicationBusService.showProgressBar();
-      this.userService.fetchUserByEmail(sub)
+      this.userService.fetchUserByCognitoSub(sub)
         .pipe(finalize(() => this.communicationBusService.closeProgressBar()))
         .subscribe({
           next: (baseVO) => {
