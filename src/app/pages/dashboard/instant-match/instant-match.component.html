@@ -84,18 +84,21 @@
                 </div>
               </div>
 
-              <!-- Available Users Pool -->
+              <!-- Available Users Pool — shown one at a time -->
               <div class="pool-section" [class.hidden]="(callStatus$ | async) !== 'idle'">
-                <p *ngIf="(poolUsers$ | async)?.length === 0" class="empty-state">
-                  No users available right now. Adjust your filters or check back soon.
-                </p>
-                <div class="user-card" *ngFor="let user of poolUsers$ | async">
-                  <div class="user-info">
-                    <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
-                    <span class="industry">{{ user.industry }}</span>
+                <ng-container *ngIf="currentUser$ | async as user; else noUsers">
+                  <div class="user-card">
+                    <div class="user-info">
+                      <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+                    </div>
+                    <button mat-flat-button color="primary" (click)="connect(user)">Connect</button>
                   </div>
-                  <button mat-flat-button color="primary" (click)="connect(user)">Connect</button>
-                </div>
+                </ng-container>
+                <ng-template #noUsers>
+                  <p class="empty-state">
+                    No users available right now. Adjust your filters or check back soon.
+                  </p>
+                </ng-template>
               </div>
 
             </div>

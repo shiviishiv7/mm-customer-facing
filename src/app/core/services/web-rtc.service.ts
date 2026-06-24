@@ -12,7 +12,7 @@ export interface PoolUser {
 }
 
 export interface WebRTCSignal {
-  type: 'POOL_LIST' | 'CONNECTION_REQUEST' | 'OFFER' | 'ANSWER' | 'ICE_CANDIDATE' | 'PEER_LEFT';
+  type: 'POOL_LIST' | 'CONNECTION_REQUEST' | 'OFFER' | 'ANSWER' | 'ICE_CANDIDATE' | 'PEER_LEFT' | 'BUSY';
   fromUserId: string;
   toUserId: string;
   payload: string;  // SDP string or ICE candidate JSON
@@ -30,13 +30,15 @@ export class WebRtcService implements OnDestroy {
   private localStream!: MediaStream;
   private pendingIceCandidates: RTCIceCandidateInit[] = []; // buffer ICE candidates until peerConnection is ready
 
-  private _poolUsers$    = new BehaviorSubject<PoolUser[]>([]);
+  // Queue of available users — shown one at a time
+  private userQueue: PoolUser[] = [];
+  private _currentUser$  = new BehaviorSubject<PoolUser | null>(null);
   private _remoteStream$ = new ReplaySubject<MediaStream>(1);
   private _localStream$  = new ReplaySubject<MediaStream>(1);  // emits when local camera is ready
   private _callStatus$   = new BehaviorSubject<string>('idle');
   private _dataChannel$  = new Subject<MessageEvent>();   // emits raw DataChannel messages
 
-  public poolUsers$    = this._poolUsers$.asObservable();
+  public currentUser$  = this._currentUser$.asObservable();
   public remoteStream$ = this._remoteStream$.asObservable();
   public localStream$  = this._localStream$.asObservable();
   public callStatus$   = this._callStatus$.asObservable();
@@ -45,6 +47,8 @@ export class WebRtcService implements OnDestroy {
   private currentPeerSub: string | null = null;
   private signalSub!: Subscription;
   private dataChannel: RTCDataChannel | null = null;
+  private requestTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private readonly REQUEST_TIMEOUT_MS = 5000;
 
   private readonly METERED_API_URL = `https://shallweconnect.metered.live/api/v1/turn/credentials?apiKey=${environment.meteredApiKey}`;
 
@@ -121,6 +125,43 @@ export class WebRtcService implements OnDestroy {
       payload: ''
     });
     console.log('[WebRTC] Connection request sent to:', targetSub);
+
+    // If no response (OFFER or BUSY) within 5s, assume user is gone — skip to next
+    this.clearRequestTimeout();
+    this.requestTimeoutId = setTimeout(() => {
+      console.log('[WebRTC] Request timeout — skipping user:', targetSub);
+      this._callStatus$.next('idle');
+      this.advanceQueue();
+    }, this.REQUEST_TIMEOUT_MS);
+  }
+
+  /** Move to the next user in the queue. If queue is empty, re-join pool. */
+  private advanceQueue(): void {
+    this.clearRequestTimeout();
+    this.userQueue.shift();
+    if (this.userQueue.length > 0) {
+      this._currentUser$.next(this.userQueue[0]);
+    } else {
+      console.log('[WebRTC] Queue exhausted — re-joining pool');
+      this._currentUser$.next(null);
+      this.joinPool();
+    }
+  }
+
+  private clearRequestTimeout(): void {
+    if (this.requestTimeoutId !== null) {
+      clearTimeout(this.requestTimeoutId);
+      this.requestTimeoutId = null;
+    }
+  }
+
+  /** Called when we are busy in a call and receive a connection request from someone else. */
+  reportBusy(callerSub: string): void {
+    this.stomp.publish('/app/webrtc.busy', {
+      toUserId: callerSub,
+      payload: ''
+    });
+    console.log('[WebRTC] Reported busy to:', callerSub);
   }
 
   // ── Step 3: Caller creates and sends SDP Offer ────────────────────────────
@@ -200,10 +241,11 @@ export class WebRtcService implements OnDestroy {
       .receiveData<any>('/user/queue/webrtc')
       .subscribe(async (data) => {
 
-        // Pool list — just got the list of available users from server
+        // Pool list — populate queue and show the first user
         if (Array.isArray(data)) {
-          this._poolUsers$.next(data as PoolUser[]);
-          console.log('[WebRTC] Pool list received:', data);
+          this.userQueue = data as PoolUser[];
+          this._currentUser$.next(this.userQueue[0] ?? null);
+          console.log('[WebRTC] Pool list received:', this.userQueue.length, 'users');
           return;
         }
 
@@ -212,18 +254,21 @@ export class WebRtcService implements OnDestroy {
 
         switch (signal.type) {
 
-          // Someone wants to connect to me — I accept and create an offer (caller creates offer)
+          // Someone wants to connect to me
           case 'CONNECTION_REQUEST':
             console.log('[WebRTC] Connection request from:', signal.fromUserId);
-            this._callStatus$.next('calling');
-            // Caller now creates offer after getting callee's acceptance
-            // In a real app you'd show a UI "Accept / Reject" button here
-            // For now, auto-accept: caller creates offer
-            await this.createAndSendOffer(signal.fromUserId);
+            if (this._callStatus$.getValue() === 'in-call') {
+              // Already in a call — tell the requester we are busy
+              this.reportBusy(signal.fromUserId);
+            } else {
+              this._callStatus$.next('calling');
+              await this.createAndSendOffer(signal.fromUserId);
+            }
             break;
 
           // I am the callee — received the SDP offer, create answer
           case 'OFFER':
+            this.clearRequestTimeout(); // offer arrived — cancel the 5s skip timer
             await this.handleOfferAndSendAnswer(signal);
             this._callStatus$.next('in-call');
             break;
@@ -237,6 +282,13 @@ export class WebRtcService implements OnDestroy {
           // ICE candidate from other peer
           case 'ICE_CANDIDATE':
             await this.handleIceCandidate(signal);
+            break;
+
+          // Target user is busy in another call — skip to next immediately
+          case 'BUSY':
+            console.log('[WebRTC] User busy:', signal.fromUserId, '— moving to next');
+            this._callStatus$.next('idle');
+            this.advanceQueue();
             break;
 
           // Other peer left or ended call

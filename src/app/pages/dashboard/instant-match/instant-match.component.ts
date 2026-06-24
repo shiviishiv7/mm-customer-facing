@@ -2,7 +2,7 @@ import {
   AfterViewInit, Component, ElementRef, inject,
   OnDestroy, OnInit, ViewChild
 } from '@angular/core';
-import { AsyncPipe, NgFor, NgIf, SlicePipe } from '@angular/common';
+import { AsyncPipe, NgIf, SlicePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +18,7 @@ import { MemePickerDialogComponent } from '@shared/meme-picker/meme-picker-dialo
 @Component({
   selector: 'app-instant-match',
   standalone: true,
-  imports: [NgFor, NgIf, AsyncPipe, SlicePipe, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [NgIf, AsyncPipe, SlicePipe, MatButtonModule, MatIconModule, MatTooltipModule],
   templateUrl: './instant-match.component.html',
   styleUrl: './instant-match.component.scss'
 })
@@ -34,7 +34,7 @@ export class InstantMatchComponent implements OnInit, AfterViewInit, OnDestroy {
   memeStream  = inject(MemeStreamService);
   private dialog = inject(MatDialog);
 
-  poolUsers$    = this.webRtc.poolUsers$;
+  currentUser$  = this.webRtc.currentUser$;
   callStatus$   = this.webRtc.callStatus$;
   chatMessages$ = this.chat.messages$;
   activeMeme$   = this.memeStream.activeMeme$;
