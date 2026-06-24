@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { BaseVO } from '../models/vo/base-vo';
 import { environment } from '@environments/environment';
+import { AuthService } from './auth.service';
 
 export interface UpcomingMeeting {
   id: string;
@@ -21,13 +22,15 @@ export interface UpcomingMeeting {
 export class MeetingService {
 
   private http = inject(HttpClient);
-  private base = `${environment.apiUrl}/meeting`;
+  private auth = inject(AuthService);
+  private base = `${environment.apiUrl}/api/v1/meetings`;
 
   getUpcoming(): Observable<BaseVO<UpcomingMeeting[]>> {
-    return this.http.get<BaseVO<UpcomingMeeting[]>>(`${this.base}/upcoming`);
+    const sub = this.auth.sub;
+    return this.http.get<BaseVO<UpcomingMeeting[]>>(`${this.base}/user/${sub}/upcoming`);
   }
 
   markCompleted(id: string): Observable<BaseVO<void>> {
-    return this.http.post<BaseVO<void>>(`${this.base}/complete/${id}`, {});
+    return this.http.patch<BaseVO<void>>(`${this.base}/${id}/cancel`, {});
   }
 }
