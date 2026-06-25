@@ -1,0 +1,244 @@
+<div class="post-match-wrapper">
+
+  <!-- ─── WRITING STATE ─── -->
+  <ng-container *ngIf="viewState === 'writing'">
+    <div class="screen-header">
+      <div class="header-icon">
+        <mat-icon>edit_note</mat-icon>
+      </div>
+      <h1 class="screen-title">Write Your <span class="accent">Post</span></h1>
+      <p class="screen-subtitle">
+        Tell us about yourself and what you're looking for. Be genuine — our AI will help fill in the rest.
+      </p>
+    </div>
+
+    <div class="input-card">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Your post</mat-label>
+        <textarea
+          matInput
+          [(ngModel)]="postText"
+          placeholder="E.g. 27M | Delhi | Looking for a life partner who values sincerity over charm. I enjoy meaningful conversations, follow Islam sincerely, and work in tech. Open to meeting families once comfortable..."
+          rows="12"
+          class="post-textarea">
+        </textarea>
+        <mat-hint>{{ postText.length }} characters · minimum 50</mat-hint>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="action-btn"
+        (click)="analyze()"
+        [disabled]="!isPostValid">
+        <mat-icon>auto_awesome</mat-icon>
+        Analyze & Continue
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- ─── ANALYZING STATE ─── -->
+  <ng-container *ngIf="viewState === 'analyzing'">
+    <div class="loading-screen">
+      <div class="loading-ring">
+        <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5"></mat-progress-spinner>
+        <mat-icon class="loading-icon">psychology</mat-icon>
+      </div>
+      <h2 class="loading-title">Reading your post…</h2>
+      <p class="loading-subtitle">Our AI is understanding your intent and preparing a few quick questions</p>
+    </div>
+  </ng-container>
+
+  <!-- ─── QUESTIONS STATE ─── -->
+  <ng-container *ngIf="viewState === 'questions' && analyzeResult">
+    <div class="screen-header">
+      <div class="category-badge">
+        <mat-icon>category</mat-icon>
+        {{ analyzeResult.categoryDisplayName }}
+      </div>
+      <h1 class="screen-title">A Few <span class="accent">Quick Questions</span></h1>
+      <p class="screen-subtitle">
+        Help us understand you better so we can find the right match.
+      </p>
+    </div>
+
+    <div class="questions-card">
+      <div *ngFor="let qa of questionAnswers; let i = index" class="question-block">
+        <p class="question-text">
+          <span class="question-number">{{ i + 1 }}</span>
+          {{ qa.question.question }}
+        </p>
+
+        <!-- text -->
+        <ng-container *ngIf="qa.question.type === 'text'">
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput [(ngModel)]="qa.value" [placeholder]="qa.question.placeholder || ''">
+          </mat-form-field>
+        </ng-container>
+
+        <!-- single_choice -->
+        <ng-container *ngIf="qa.question.type === 'single_choice'">
+          <div class="pill-group">
+            <button
+              *ngFor="let opt of qa.question.options"
+              class="pill-btn"
+              [class.pill-btn--active]="qa.value === opt"
+              (click)="qa.value = opt">
+              {{ opt }}
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- multi_choice -->
+        <ng-container *ngIf="qa.question.type === 'multi_choice'">
+          <div class="pill-group">
+            <button
+              *ngFor="let opt of qa.question.options"
+              class="pill-btn"
+              [class.pill-btn--active]="isOptionSelected(qa, opt)"
+              (click)="toggleOption(qa, opt)">
+              {{ opt }}
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- boolean -->
+        <ng-container *ngIf="qa.question.type === 'boolean'">
+          <div class="pill-group">
+            <button class="pill-btn" [class.pill-btn--active]="qa.value === 'true'" (click)="qa.value = 'true'">Yes</button>
+            <button class="pill-btn" [class.pill-btn--active]="qa.value === 'false'" (click)="qa.value = 'false'">No</button>
+          </div>
+        </ng-container>
+
+        <!-- dropdown -->
+        <ng-container *ngIf="qa.question.type === 'dropdown'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-select [(ngModel)]="qa.value">
+              <mat-option *ngFor="let opt of qa.question.options" [value]="opt">{{ opt }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+
+        <!-- range -->
+        <ng-container *ngIf="qa.question.type === 'range'">
+          <div class="range-row">
+            <div class="range-field">
+              <label class="range-label">Min</label>
+              <mat-form-field appearance="outline" class="range-input">
+                <input matInput type="number" [(ngModel)]="qa.rangeMin"
+                  [min]="qa.question.min" [max]="qa.rangeMax">
+              </mat-form-field>
+            </div>
+            <span class="range-sep">—</span>
+            <div class="range-field">
+              <label class="range-label">Max</label>
+              <mat-form-field appearance="outline" class="range-input">
+                <input matInput type="number" [(ngModel)]="qa.rangeMax"
+                  [min]="qa.rangeMin" [max]="qa.question.max">
+              </mat-form-field>
+            </div>
+          </div>
+        </ng-container>
+
+        <mat-divider *ngIf="i < questionAnswers.length - 1" class="q-divider"></mat-divider>
+      </div>
+
+      <div class="questions-actions">
+        <button mat-stroked-button (click)="viewState = 'writing'">
+          <mat-icon>arrow_back</mat-icon> Edit Post
+        </button>
+        <button mat-raised-button color="primary" class="action-btn" (click)="submit()">
+          <mat-icon>send</mat-icon> Submit & Find Matches
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ─── SUBMITTING STATE ─── -->
+  <ng-container *ngIf="viewState === 'submitting'">
+    <div class="loading-screen">
+      <div class="loading-ring">
+        <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5"></mat-progress-spinner>
+        <mat-icon class="loading-icon">save</mat-icon>
+      </div>
+      <h2 class="loading-title">Saving your post…</h2>
+      <p class="loading-subtitle">Almost there</p>
+    </div>
+  </ng-container>
+
+  <!-- ─── WAITING STATE ─── -->
+  <ng-container *ngIf="viewState === 'waiting'">
+    <div class="loading-screen">
+      <div class="loading-ring pulse">
+        <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5"></mat-progress-spinner>
+        <mat-icon class="loading-icon">manage_search</mat-icon>
+      </div>
+      <h2 class="loading-title">Finding your matches…</h2>
+      <p class="loading-subtitle">Our AI is scanning profiles and scoring compatibility. This takes a few seconds.</p>
+      <p class="waiting-hint">You'll be notified here the moment we find someone.</p>
+    </div>
+  </ng-container>
+
+  <!-- ─── RESULT STATE ─── -->
+  <ng-container *ngIf="viewState === 'result' && matchResult">
+
+    <!-- MATCH FOUND -->
+    <ng-container *ngIf="matchResult.event === 'POST_MATCH_FOUND'">
+      <div class="result-screen">
+        <div class="result-icon result-icon--success">
+          <mat-icon>favorite</mat-icon>
+        </div>
+        <h1 class="screen-title">Match <span class="accent">Found!</span></h1>
+        <p class="screen-subtitle">{{ matchResult.message }}</p>
+
+        <mat-card class="match-card">
+          <mat-card-content>
+            <div class="match-score-row">
+              <div class="score-circle">
+                <span class="score-num">{{ matchScorePercent }}</span>
+                <span class="score-pct">%</span>
+              </div>
+              <div class="score-label">Compatibility Score</div>
+            </div>
+            <mat-divider class="score-divider"></mat-divider>
+            <p class="match-hint">Open the app to view your match and start a conversation.</p>
+          </mat-card-content>
+        </mat-card>
+
+        <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
+          <mat-icon>edit_note</mat-icon> Write Another Post
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- NO MATCH YET -->
+    <ng-container *ngIf="matchResult.event === 'POST_NO_MATCH_FOUND'">
+      <div class="result-screen">
+        <div class="result-icon result-icon--info">
+          <mat-icon>hourglass_top</mat-icon>
+        </div>
+        <h1 class="screen-title">Post <span class="accent">Saved!</span></h1>
+        <p class="screen-subtitle">{{ matchResult.message }}</p>
+        <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
+          <mat-icon>edit_note</mat-icon> Write Another Post
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- ERROR -->
+    <ng-container *ngIf="matchResult.event === 'POST_MATCH_ERROR'">
+      <div class="result-screen">
+        <div class="result-icon result-icon--warn">
+          <mat-icon>warning_amber</mat-icon>
+        </div>
+        <h1 class="screen-title">Post <span class="accent">Saved</span></h1>
+        <p class="screen-subtitle">{{ matchResult.message }}</p>
+        <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
+          <mat-icon>refresh</mat-icon> Try Again
+        </button>
+      </div>
+    </ng-container>
+
+  </ng-container>
+
+</div>

@@ -1,0 +1,348 @@
+.post-match-wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+// ─── Header ────────────────────────────────────────────────────────────────
+
+.screen-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c47ff22, #ff6b9d22);
+  margin-bottom: 16px;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: #6c47ff;
+  }
+}
+
+.screen-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 8px;
+
+  .accent {
+    color: #6c47ff;
+  }
+}
+
+.screen-subtitle {
+  font-size: 15px;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #6c47ff18;
+  color: #6c47ff;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+// ─── Input card ────────────────────────────────────────────────────────────
+
+.input-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+
+.full-width { width: 100%; }
+
+.post-textarea {
+  font-size: 15px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+// ─── Action button ─────────────────────────────────────────────────────────
+
+.action-btn {
+  width: 100%;
+  margin-top: 20px;
+  height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: 10px;
+
+  mat-icon { margin-right: 6px; }
+}
+
+// ─── Loading screen ────────────────────────────────────────────────────────
+
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 340px;
+  text-align: center;
+  gap: 16px;
+}
+
+.loading-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 8px;
+
+  &.pulse { animation: pulse 2s infinite; }
+}
+
+.loading-icon {
+  position: absolute;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: #6c47ff;
+}
+
+.loading-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.loading-subtitle {
+  font-size: 14px;
+  color: #777;
+  margin: 0;
+  max-width: 380px;
+}
+
+.waiting-hint {
+  font-size: 13px;
+  color: #aaa;
+  margin: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+// ─── Questions card ────────────────────────────────────────────────────────
+
+.questions-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+
+.question-block {
+  padding: 16px 0;
+}
+
+.question-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.question-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #6c47ff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.q-divider {
+  margin-top: 16px;
+}
+
+// ─── Pill buttons ──────────────────────────────────────────────────────────
+
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pill-btn {
+  padding: 8px 18px;
+  border-radius: 24px;
+  border: 1.5px solid #ddd;
+  background: #fafafa;
+  color: #444;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: #6c47ff;
+    color: #6c47ff;
+  }
+
+  &--active {
+    background: #6c47ff;
+    border-color: #6c47ff;
+    color: #fff;
+
+    &:hover { background: #5535ee; }
+  }
+}
+
+// ─── Range inputs ──────────────────────────────────────────────────────────
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.range-label {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+
+.range-input { width: 100px; }
+
+.range-sep {
+  font-size: 20px;
+  color: #ccc;
+  margin-top: 18px;
+}
+
+// ─── Questions actions ─────────────────────────────────────────────────────
+
+.questions-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+
+  button:first-child { flex: 0 0 auto; }
+  .action-btn { flex: 1; margin-top: 0; }
+}
+
+// ─── Result screen ─────────────────────────────────────────────────────────
+
+.result-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.result-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  &--success {
+    background: #e8f5e9;
+    mat-icon { color: #2e7d32; }
+  }
+  &--info {
+    background: #e3f2fd;
+    mat-icon { color: #1565c0; }
+  }
+  &--warn {
+    background: #fff8e1;
+    mat-icon { color: #f57f17; }
+  }
+}
+
+.match-card {
+  width: 100%;
+  max-width: 340px;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.09) !important;
+}
+
+.match-score-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0 12px;
+}
+
+.score-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c47ff, #ff6b9d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+}
+
+.score-num { font-size: 26px; }
+.score-pct { font-size: 14px; margin-top: 4px; }
+
+.score-label {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+.score-divider { margin: 8px 0; }
+
+.match-hint {
+  font-size: 13px;
+  color: #666;
+  padding: 8px 0 4px;
+}

@@ -52,6 +52,17 @@
                 </button>
               </li>
 
+              <li class="nav-item">
+                <button
+                  (click)="commBus.isMobileView() && drawer.close()"
+                  class="btn btn-primary w-100 mb-2"
+                  [routerLink]="ApplicationRoutingEnum.POST_MATCH"
+                  routerLinkActive="active">
+                  <mat-icon class="me-2">edit_note</mat-icon>
+                  Post & Match
+                </button>
+              </li>
+
             </ul>
           </div>
         </mat-drawer>

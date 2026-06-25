@@ -5,4 +5,5 @@ export enum ApplicationRoutingEnum {
   INSTANCE_MEETING = 'instance-meeting',
   SCHEDULED_MATCH = 'scheduled-match',
   PARSER_MATCH = 'parser-match',
+  POST_MATCH = 'post-match',
 }
