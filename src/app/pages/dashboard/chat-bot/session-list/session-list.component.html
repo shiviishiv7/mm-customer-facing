@@ -1,0 +1,57 @@
+<div class="session-list-wrapper">
+
+  <!-- Header -->
+  <div class="screen-header">
+    <div class="header-icon">
+      <mat-icon>smart_toy</mat-icon>
+    </div>
+    <h1 class="screen-title">Find Your <span class="accent">Match</span></h1>
+    <p class="screen-subtitle">
+      Chat with our AI to find the perfect connection. Each chat focuses on one category.
+    </p>
+    <button mat-raised-button color="primary" class="new-chat-btn" (click)="startNewChat()">
+      <mat-icon>add</mat-icon>
+      Start New Chat
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-center" *ngIf="loading">
+    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && sessions.length === 0">
+    <mat-icon class="empty-icon">chat_bubble_outline</mat-icon>
+    <p>No chats yet. Start one to find your match!</p>
+  </div>
+
+  <!-- Session list -->
+  <div class="session-cards" *ngIf="!loading && sessions.length > 0">
+    <div
+      class="session-card"
+      *ngFor="let session of sessions"
+      (click)="resumeSession(session)">
+
+      <div class="session-card-left">
+        <mat-icon class="session-icon">forum</mat-icon>
+        <div class="session-info">
+          <div class="session-category">
+            {{ session.detectedCategory ? session.detectedCategory.replace('_', ' ') : 'Category not detected yet' }}
+          </div>
+          <div class="session-meta">
+            {{ session.questionCount }} questions · {{ session.createdAt | date: 'dd MMM, hh:mm a' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="session-card-right">
+        <mat-chip [color]="statusColor(session.status)" highlighted>
+          {{ statusLabel(session.status) }}
+        </mat-chip>
+        <mat-icon class="chevron">chevron_right</mat-icon>
+      </div>
+    </div>
+  </div>
+
+</div>

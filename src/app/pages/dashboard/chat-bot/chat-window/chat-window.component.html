@@ -1,0 +1,156 @@
+<div class="chat-wrapper">
+
+  <!-- ─── LOADING ─── -->
+  <div class="loading-center" *ngIf="loading">
+    <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+  </div>
+
+  <!-- ─── SEARCHING STATE (mirrors post-match page) ─── -->
+  <ng-container *ngIf="!loading && viewState === 'searching'">
+    <div class="search-screen">
+      <div class="loading-ring">
+        <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5"></mat-progress-spinner>
+        <mat-icon class="loading-icon">manage_search</mat-icon>
+      </div>
+      <h2 class="loading-title">Finding your matches...</h2>
+      <p class="loading-subtitle">Our AI is scanning profiles and scoring compatibility. This takes a few seconds.</p>
+      <p class="loading-hint">You'll be notified here the moment we find someone.</p>
+    </div>
+  </ng-container>
+
+  <!-- ─── CONNECTING STATE ─── -->
+  <ng-container *ngIf="!loading && viewState === 'connecting'">
+    <div class="search-screen">
+      <mat-icon class="success-icon">celebration</mat-icon>
+      <h2 class="loading-title">Match found! Connecting you now...</h2>
+    </div>
+  </ng-container>
+
+  <!-- ─── NO ACTIVE MATCH ─── -->
+  <ng-container *ngIf="!loading && viewState === 'no-active-match'">
+    <div class="search-screen">
+      <mat-icon class="info-icon">notifications_active</mat-icon>
+      <h2 class="loading-title">Match saved!</h2>
+      <p class="loading-subtitle">No one is online right now. We'll notify you the moment your match comes online.</p>
+      <button mat-stroked-button color="primary" (click)="viewState = 'chat'">Back to Chat</button>
+    </div>
+  </ng-container>
+
+  <!-- ─── NO MATCH FOUND ─── -->
+  <ng-container *ngIf="!loading && viewState === 'no-match'">
+    <div class="search-screen">
+      <mat-icon class="info-icon">search_off</mat-icon>
+      <h2 class="loading-title">No matches yet</h2>
+      <p class="loading-subtitle">We couldn't find anyone right now. We'll notify you when someone matches your profile.</p>
+      <button mat-stroked-button color="primary" (click)="viewState = 'chat'">Back to Chat</button>
+    </div>
+  </ng-container>
+
+  <!-- ─── SUBMITTING ─── -->
+  <ng-container *ngIf="!loading && viewState === 'submitting'">
+    <div class="search-screen">
+      <mat-progress-spinner mode="indeterminate" diameter="56"></mat-progress-spinner>
+      <p class="loading-subtitle" style="margin-top: 16px;">Starting your match search...</p>
+    </div>
+  </ng-container>
+
+  <!-- ─── MAIN CHAT ─── -->
+  <ng-container *ngIf="!loading && viewState === 'chat'">
+
+    <!-- Top bar -->
+    <div class="chat-topbar">
+      <button mat-icon-button (click)="goBack()" matTooltip="Back to sessions">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="topbar-info">
+        <div class="topbar-category">
+          {{ session?.detectedCategory ? (session!.detectedCategory!.replace('_', ' ')) : 'New Chat' }}
+        </div>
+        <div class="topbar-meta">{{ session?.questionCount ?? 0 }} questions answered</div>
+      </div>
+      <mat-chip [color]="session?.status === 'AWAITING_SUBMIT' ? 'accent' : 'primary'" highlighted>
+        {{ session?.status === 'AWAITING_SUBMIT' ? 'Ready!' : 'In Progress' }}
+      </mat-chip>
+    </div>
+
+    <!-- Message feed -->
+    <div class="message-feed">
+
+      <ng-container *ngFor="let msg of messages">
+        <!-- Bot message -->
+        <div class="message-row bot" *ngIf="msg.role === 'assistant'">
+          <div class="avatar bot-avatar"><mat-icon>smart_toy</mat-icon></div>
+          <div class="bubble bot-bubble">{{ msg.content }}</div>
+        </div>
+        <!-- User message -->
+        <div class="message-row user" *ngIf="msg.role === 'user'">
+          <div class="bubble user-bubble">{{ msg.content }}</div>
+          <div class="avatar user-avatar"><mat-icon>person</mat-icon></div>
+        </div>
+      </ng-container>
+
+      <!-- Streaming in progress -->
+      <div class="message-row bot" *ngIf="botTyping">
+        <div class="avatar bot-avatar"><mat-icon>smart_toy</mat-icon></div>
+        <div class="bubble bot-bubble">
+          <span *ngIf="streamingMessage">{{ streamingMessage }}</span>
+          <span class="typing-dots" *ngIf="!streamingMessage">
+            <span></span><span></span><span></span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Category selection chips (multiple categories detected) -->
+      <div class="category-select" *ngIf="detectedCategories.length > 0 && !botTyping">
+        <p class="category-select-label">Please select one to continue:</p>
+        <div class="category-chips">
+          <button
+            mat-stroked-button
+            color="primary"
+            class="category-chip-btn"
+            *ngFor="let cat of detectedCategories"
+            (click)="selectCategory(cat)">
+            {{ cat.replace('_', ' ') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit button (appears when AWAITING_SUBMIT) -->
+      <div class="submit-row" *ngIf="isAwaitingSubmit && !botTyping">
+        <button mat-raised-button color="primary" class="find-match-btn" (click)="submitForMatch()">
+          <mat-icon>search</mat-icon>
+          Find My Match
+        </button>
+      </div>
+
+      <div #messageEnd></div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="input-bar" *ngIf="!isSubmitted">
+      <textarea
+        class="input-field"
+        [(ngModel)]="userInput"
+        placeholder="Type your message..."
+        rows="1"
+        maxlength="500"
+        (keydown)="onKeydown($event)">
+      </textarea>
+      <button
+        mat-icon-button
+        color="primary"
+        class="send-btn"
+        [disabled]="!userInput.trim() || botTyping"
+        (click)="sendMessage()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+
+    <!-- Submitted banner -->
+    <div class="submitted-banner" *ngIf="isSubmitted">
+      <mat-icon>check_circle</mat-icon>
+      Match search submitted. Start a new chat for another category.
+    </div>
+
+  </ng-container>
+</div>

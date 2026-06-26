@@ -49,8 +49,10 @@
     </div>
   </ng-container>
 
-  <!-- ─── QUESTIONS STATE ─── -->
+  <!-- ─── QUESTIONS STATE (STEPPER) ─── -->
   <ng-container *ngIf="viewState === 'questions' && analyzeResult">
+
+    <!-- Header -->
     <div class="screen-header">
       <div class="category-badge">
         <mat-icon>category</mat-icon>
@@ -62,10 +64,28 @@
       </p>
     </div>
 
+    <!-- Step dots + progress bar -->
+    <div class="stepper-header">
+      <div class="stepper-dots">
+        <span
+          *ngFor="let step of steps; let si = index"
+          class="stepper-dot"
+          [class.stepper-dot--active]="si === currentStep"
+          [class.stepper-dot--done]="si < currentStep">
+        </span>
+      </div>
+      <p class="stepper-progress">
+        Step {{ currentStep + 1 }} of {{ steps.length }}
+        &nbsp;·&nbsp;
+        Questions {{ stepOffset + 1 }}–{{ stepOffset + steps[currentStep]?.length }} of {{ questionAnswers.length }}
+      </p>
+    </div>
+
+    <!-- Question card for current step (2 questions) -->
     <div class="questions-card">
-      <div *ngFor="let qa of questionAnswers; let i = index" class="question-block">
+      <div *ngFor="let qa of steps[currentStep]; let i = index" class="question-block">
         <p class="question-text">
-          <span class="question-number">{{ i + 1 }}</span>
+          <span class="question-number">{{ stepOffset + i + 1 }}</span>
           {{ qa.question.question }}
         </p>
 
@@ -79,33 +99,27 @@
         <!-- single_choice -->
         <ng-container *ngIf="qa.question.type === 'single_choice'">
           <div class="pill-group">
-            <button
-              *ngFor="let opt of qa.question.options"
+            <button *ngFor="let opt of qa.question.options"
               class="pill-btn"
               [class.pill-btn--active]="qa.value === opt"
-              (click)="qa.value = opt">
-              {{ opt }}
-            </button>
+              (click)="qa.value = opt">{{ opt }}</button>
           </div>
         </ng-container>
 
         <!-- multi_choice -->
         <ng-container *ngIf="qa.question.type === 'multi_choice'">
           <div class="pill-group">
-            <button
-              *ngFor="let opt of qa.question.options"
+            <button *ngFor="let opt of qa.question.options"
               class="pill-btn"
               [class.pill-btn--active]="isOptionSelected(qa, opt)"
-              (click)="toggleOption(qa, opt)">
-              {{ opt }}
-            </button>
+              (click)="toggleOption(qa, opt)">{{ opt }}</button>
           </div>
         </ng-container>
 
         <!-- boolean -->
         <ng-container *ngIf="qa.question.type === 'boolean'">
           <div class="pill-group">
-            <button class="pill-btn" [class.pill-btn--active]="qa.value === 'true'" (click)="qa.value = 'true'">Yes</button>
+            <button class="pill-btn" [class.pill-btn--active]="qa.value === 'true'"  (click)="qa.value = 'true'">Yes</button>
             <button class="pill-btn" [class.pill-btn--active]="qa.value === 'false'" (click)="qa.value = 'false'">No</button>
           </div>
         </ng-container>
@@ -140,18 +154,34 @@
           </div>
         </ng-container>
 
-        <mat-divider *ngIf="i < questionAnswers.length - 1" class="q-divider"></mat-divider>
+        <mat-divider *ngIf="i < steps[currentStep].length - 1" class="q-divider"></mat-divider>
       </div>
 
-      <div class="questions-actions">
-        <button mat-stroked-button (click)="viewState = 'writing'">
-          <mat-icon>arrow_back</mat-icon> Edit Post
+      <!-- Navigation row -->
+      <div class="step-nav">
+        <!-- Left: back to post or previous step -->
+        <button mat-stroked-button (click)="isFirstStep ? (viewState = 'writing') : prevStep()">
+          <mat-icon>arrow_back</mat-icon>
+          {{ isFirstStep ? 'Edit Post' : 'Previous' }}
         </button>
-        <button mat-raised-button color="primary" class="action-btn" (click)="submit()">
+
+        <!-- Right: next step or final submit -->
+        <button *ngIf="!isLastStep"
+          mat-raised-button color="primary"
+          (click)="nextStep()">
+          Next
+          <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+        </button>
+
+        <button *ngIf="isLastStep"
+          mat-raised-button color="primary"
+          class="submit-btn"
+          (click)="submit()">
           <mat-icon>send</mat-icon> Submit & Find Matches
         </button>
       </div>
     </div>
+
   </ng-container>
 
   <!-- ─── SUBMITTING STATE ─── -->

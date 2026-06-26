@@ -7,7 +7,9 @@
     "start:dev": "ng serve -c development",
     "start:prod": "ng serve -c production",
     "build:prod": "ng build -c production",
-    "build:dev": "ng build -c development"
+    "build:dev": "ng build -c development",
+    "e2e": "cypress run --browser chrome --headless",
+    "e2e:open": "cypress open"
   },
   "private": true,
   "dependencies": {
@@ -52,6 +54,7 @@
     "@types/jasmine": "~5.1.0",
     "@types/papaparse": "^5.3.15",
     "@types/sockjs-client": "^1.5.4",
+    "cypress": "^15.18.0",
     "eslint": "^9.17.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",

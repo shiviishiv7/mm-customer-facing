@@ -62,6 +62,14 @@ export class ScheduledMatchComponent implements OnInit, AfterViewInit, OnDestroy
   ngOnInit(): void {
     this.scheduledMatch.connect();
     this.loadUpcoming();
+
+    // Expose hook for Cypress E2E tests — forces a specific call state
+    if ((window as any).Cypress) {
+      (window as any).__cypressSetCallState = (state: import('@core/services/scheduled-match.service').ScheduledMatchState) => {
+        this.scheduledMatch.triggerWaitingRoom('test-meeting-id', 'test-match-id');
+        if (state === 'ended') this.scheduledMatch.endCall();
+      };
+    }
   }
 
   ngAfterViewInit(): void {

@@ -17,6 +17,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatStepperModule } from '@angular/material/stepper';
 
 import { Router } from '@angular/router';
 import { PostService, PostQuestion, PostAnswer, PostAnalyzeResponse } from '@core/services/post.service';
@@ -62,6 +63,7 @@ interface QuestionAnswer {
     MatCheckboxModule,
     MatSelectModule,
     MatDividerModule,
+    MatStepperModule,
   ],
   templateUrl: './post-match.component.html',
   styleUrl: './post-match.component.scss',
@@ -73,6 +75,33 @@ export class PostMatchComponent implements OnInit, OnDestroy {
   analyzeResult: PostAnalyzeResponse | null = null;
   questionAnswers: QuestionAnswer[] = [];
   matchResult: MatchNotification | null = null;
+
+  // ── Stepper ────────────────────────────────────────────────────────────────
+  /** Index of the currently visible step (0-based). */
+  currentStep = 0;
+
+  /** Questions chunked into pairs of 2 for the stepper. */
+  get steps(): QuestionAnswer[][] {
+    const out: QuestionAnswer[][] = [];
+    for (let i = 0; i < this.questionAnswers.length; i += 2) {
+      out.push(this.questionAnswers.slice(i, i + 2));
+    }
+    return out;
+  }
+
+  get isFirstStep(): boolean { return this.currentStep === 0; }
+  get isLastStep(): boolean  { return this.currentStep === this.steps.length - 1; }
+
+  /** Global question index of the first question in the current step. */
+  get stepOffset(): number { return this.currentStep * 2; }
+
+  nextStep(): void {
+    if (!this.isLastStep) this.currentStep++;
+  }
+
+  prevStep(): void {
+    if (!this.isFirstStep) this.currentStep--;
+  }
 
   private matchSub!: Subscription;
 
@@ -88,26 +117,37 @@ export class PostMatchComponent implements OnInit, OnDestroy {
     this.wsService.connect();
     this.postMatchService.connect();
 
+    // Expose hook for Cypress E2E tests — injects a mock WebSocket notification
+    if ((window as any).Cypress) {
+      (window as any).__cypressInjectMatchNotification = (n: MatchNotification) => {
+        this.viewState = 'waiting';
+        this.matchResult = n;
+        this.handleNotification(n);
+      };
+    }
+
     this.matchSub = this.postMatchService.notification$.subscribe(n => {
       if (!n || this.viewState !== 'waiting') return;
       this.matchResult = n;
-
-      switch (n.event) {
-        case 'POST_MATCH_CONNECTING':
-          // WebRTC is starting — navigate to the call screen
-          this.viewState = 'connecting';
-          setTimeout(() => this.router.navigate(['/dashboard/scheduled-match']), 1500);
-          break;
-        case 'POST_NO_ACTIVE_MATCH':
-          this.viewState = 'no-active-match';
-          break;
-        case 'POST_NO_MATCH_FOUND':
-          this.viewState = 'no-match';
-          break;
-        default:
-          this.viewState = 'result';
-      }
+      this.handleNotification(n);
     });
+  }
+
+  private handleNotification(n: MatchNotification): void {
+    switch (n.event) {
+      case 'POST_MATCH_CONNECTING':
+        this.viewState = 'connecting';
+        setTimeout(() => this.router.navigate(['/dashboard/scheduled-match']), 1500);
+        break;
+      case 'POST_NO_ACTIVE_MATCH':
+        this.viewState = 'no-active-match';
+        break;
+      case 'POST_NO_MATCH_FOUND':
+        this.viewState = 'no-match';
+        break;
+      default:
+        this.viewState = 'result';
+    }
   }
 
   get isPostValid(): boolean {
@@ -131,6 +171,7 @@ export class PostMatchComponent implements OnInit, OnDestroy {
             rangeMin: q.min ?? 18,
             rangeMax: q.max ?? 60,
           }));
+          this.currentStep = 0;
           this.viewState = 'questions';
         } else {
           this.showError(res.message || 'Analysis failed.');
@@ -202,6 +243,7 @@ export class PostMatchComponent implements OnInit, OnDestroy {
     this.analyzeResult = null;
     this.questionAnswers = [];
     this.matchResult = null;
+    this.currentStep = 0;
     this.postMatchService.reset();
     this.viewState = 'writing';
   }

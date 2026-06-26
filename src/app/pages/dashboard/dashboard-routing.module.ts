@@ -44,6 +44,10 @@ const routes: Routes = [
         pathMatch: 'full',
       },
       {
+        path: 'chat-bot',
+        loadChildren: () => import('./chat-bot/chat-bot.module').then(m => m.ChatBotModule),
+      },
+      {
         path: '',
         redirectTo: 'post-match',
         pathMatch: 'full',

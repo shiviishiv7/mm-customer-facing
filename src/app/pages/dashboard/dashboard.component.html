@@ -24,6 +24,17 @@
                 <button
                   (click)="commBus.isMobileView() && drawer.close()"
                   class="btn btn-primary w-100 mb-2"
+                  [routerLink]="ApplicationRoutingEnum.CHAT_BOT"
+                  routerLinkActive="active">
+                  <mat-icon class="me-2">smart_toy</mat-icon>
+                  Chat & Match
+                </button>
+              </li>
+
+              <li class="nav-item">
+                <button
+                  (click)="commBus.isMobileView() && drawer.close()"
+                  class="btn btn-primary w-100 mb-2"
                   [routerLink]="ApplicationRoutingEnum.INSTANCE_MEETING"
                   routerLinkActive="active">
                   <mat-icon class="me-2">flash_on</mat-icon>
