@@ -13,10 +13,10 @@
                 <button
                   (click)="commBus.isMobileView() && drawer.close()"
                   class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.HOME"
+                  [routerLink]="ApplicationRoutingEnum.POST_MATCH"
                   routerLinkActive="active">
-                  <mat-icon class="me-2">home</mat-icon>
-                  Home
+                  <mat-icon class="me-2">edit_note</mat-icon>
+                  Post & Match
                 </button>
               </li>
 
@@ -31,37 +31,16 @@
                 </button>
               </li>
 
-              <li class="nav-item">
-                <button
-                  (click)="commBus.isMobileView() && drawer.close()"
-                  class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.SCHEDULED_MATCH"
-                  routerLinkActive="active">
-                  <mat-icon class="me-2">event</mat-icon>
-                  Schedule Meeting
-                </button>
-              </li>
-              <li class="nav-item">
-                <button
-                  (click)="commBus.isMobileView() && drawer.close()"
-                  class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.PARSER_MATCH"
-                  routerLinkActive="active">
-                  <mat-icon class="me-2">event</mat-icon>
-                  PARSER_MATCH
-                </button>
-              </li>
-
-              <li class="nav-item">
-                <button
-                  (click)="commBus.isMobileView() && drawer.close()"
-                  class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.POST_MATCH"
-                  routerLinkActive="active">
-                  <mat-icon class="me-2">edit_note</mat-icon>
-                  Post & Match
-                </button>
-              </li>
+<!--              <li class="nav-item">-->
+<!--                <button-->
+<!--                  (click)="commBus.isMobileView() && drawer.close()"-->
+<!--                  class="btn btn-primary w-100 mb-2"-->
+<!--                  [routerLink]="ApplicationRoutingEnum.SCHEDULED_MATCH"-->
+<!--                  routerLinkActive="active">-->
+<!--                  <mat-icon class="me-2">event</mat-icon>-->
+<!--                  Schedule Meeting-->
+<!--                </button>-->
+<!--              </li>-->
 
             </ul>
           </div>

@@ -5,7 +5,8 @@
       "name": "matchmaking-frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start:localhost"],
-      "port": 4200
+      "port": 4200,
+      "cwd": "/Users/shivji.prasad/Documents/mt/ft/matchmaking"
     }
   ]
 }

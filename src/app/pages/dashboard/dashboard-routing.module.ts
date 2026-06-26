@@ -5,7 +5,6 @@ import {UserProfileComponent} from './user/user-profile/user-profile.component';
 import {InstantMatchComponent} from './instant-match/instant-match.component';
 import {ScheduledMatchComponent} from './scheduled-match/scheduled-match.component';
 import {HomeComponent} from './home/home.component';
-import {ParseMatchComponent} from './parse-match/parse-match.component';
 import {PostMatchComponent} from './post-match/post-match.component';
 
 
@@ -40,18 +39,13 @@ const routes: Routes = [
         pathMatch: 'full',
       },
       {
-        path: 'parser-match',
-        component: ParseMatchComponent,
-        pathMatch: 'full',
-      },
-      {
         path: 'post-match',
         component: PostMatchComponent,
         pathMatch: 'full',
       },
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'post-match',
         pathMatch: 'full',
       },
     ],
