@@ -33,6 +33,9 @@ export class ScheduledMatchService implements OnDestroy {
   public meetingId$ = this._meetingId$.asObservable();
   public matchId$   = this._matchId$.asObservable();
 
+  /** Synchronous snapshot — use for one-shot operations like feedback submission. */
+  get currentMeetingId(): string | null { return this._meetingId$.getValue(); }
+
   private meetingSub!: Subscription;
   private connected = false;
 

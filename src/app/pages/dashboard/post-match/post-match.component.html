@@ -179,6 +179,55 @@
     </div>
   </ng-container>
 
+  <!-- ─── CONNECTING STATE ─── -->
+  <ng-container *ngIf="viewState === 'connecting'">
+    <div class="loading-screen">
+      <div class="loading-ring">
+        <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5" color="accent"></mat-progress-spinner>
+        <mat-icon class="loading-icon">videocam</mat-icon>
+      </div>
+      <h2 class="loading-title">Match Found!</h2>
+      <p class="loading-subtitle">Your match is online right now. Starting your video call…</p>
+      <p class="waiting-hint">Taking you to the call screen in a moment.</p>
+    </div>
+  </ng-container>
+
+  <!-- ─── NO ACTIVE MATCH STATE ─── -->
+  <ng-container *ngIf="viewState === 'no-active-match'">
+    <div class="result-screen">
+      <div class="result-icon result-icon--info">
+        <mat-icon>mail_outline</mat-icon>
+      </div>
+      <h1 class="screen-title">Match <span class="accent">Saved!</span></h1>
+      <p class="screen-subtitle">
+        We found you a great match, but they're not online right now.
+        We've emailed both of you — you'll get a notification the moment they come online.
+      </p>
+      <div class="action-row">
+        <button mat-raised-button color="primary" class="action-btn" routerLink="/dashboard/scheduled-match">
+          <mat-icon>videocam</mat-icon> Go to Meetings
+        </button>
+        <button mat-stroked-button class="action-btn" (click)="reset()">
+          <mat-icon>edit_note</mat-icon> Write Another Post
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ─── NO MATCH AT ALL STATE ─── -->
+  <ng-container *ngIf="viewState === 'no-match'">
+    <div class="result-screen">
+      <div class="result-icon result-icon--info">
+        <mat-icon>hourglass_top</mat-icon>
+      </div>
+      <h1 class="screen-title">Post <span class="accent">Saved!</span></h1>
+      <p class="screen-subtitle">No match found yet. We'll notify you as soon as someone matching your profile joins.</p>
+      <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
+        <mat-icon>edit_note</mat-icon> Write Another Post
+      </button>
+    </div>
+  </ng-container>
+
   <!-- ─── RESULT STATE ─── -->
   <ng-container *ngIf="viewState === 'result' && matchResult">
 

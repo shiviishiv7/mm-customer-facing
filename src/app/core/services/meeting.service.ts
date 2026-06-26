@@ -33,4 +33,14 @@ export class MeetingService {
   markCompleted(id: string): Observable<BaseVO<void>> {
     return this.http.patch<BaseVO<void>>(`${this.base}/${id}/cancel`, {});
   }
+
+  submitFeedback(meetingId: string, response: 'YES' | 'NO', notes?: string): Observable<BaseVO<void>> {
+    return this.http.post<BaseVO<void>>(`${this.base}/${meetingId}/feedback`, { response, notes });
+  }
+
+  requestNextMatch(): Observable<BaseVO<{ connecting: boolean }>> {
+    return this.http.post<BaseVO<{ connecting: boolean }>>(
+      `${environment.apiUrl}/api/v1/matches/next`, {}
+    );
+  }
 }

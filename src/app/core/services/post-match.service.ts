@@ -3,9 +3,15 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { WebSocketConnectionService } from './web-socket-connection.service';
 
 export interface MatchNotification {
-  event: 'POST_MATCH_FOUND' | 'POST_NO_MATCH_FOUND' | 'POST_MATCH_ERROR';
+  event:
+    | 'POST_MATCH_CONNECTING'   // match found AND candidate is online — WebRTC starting on /queue/meeting
+    | 'POST_NO_ACTIVE_MATCH'    // match saved, no one online right now — emails sent
+    | 'POST_NO_MATCH_FOUND'     // no candidates at all
+    | 'POST_MATCH_ERROR'        // something went wrong
+    | 'MATCH_NOW_ONLINE';       // a previously saved match just came online
   matchedUserId?: string;
   matchedUserName?: string;
+  matchId?: string;
   compatibilityScore?: number;
   message: string;
 }

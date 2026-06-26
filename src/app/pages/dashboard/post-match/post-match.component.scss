@@ -346,3 +346,13 @@
   color: #666;
   padding: 8px 0 4px;
 }
+
+.action-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+
+  .action-btn { min-width: 180px; }
+}

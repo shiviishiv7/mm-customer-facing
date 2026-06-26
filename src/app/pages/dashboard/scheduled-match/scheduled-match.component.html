@@ -73,14 +73,73 @@
     </button>
   </div>
 
-  <!-- ── Call ended ──────────────────────────────────────────────────────────── -->
-  <div class="state-panel" *ngIf="(state$ | async) === 'ended'">
-    <div class="icon">✅</div>
-    <h2>Call ended</h2>
-    <p>Your meeting has finished. You'll be asked for feedback shortly.</p>
-    <button mat-flat-button color="primary" style="margin-top:1rem" (click)="backToList()">
-      Back to Meetings
-    </button>
+  <!-- ── Call ended → Feedback form ──────────────────────────────────────── -->
+  <div class="state-panel feedback-panel" *ngIf="(state$ | async) === 'ended'">
+
+    <!-- Feedback not yet submitted -->
+    <ng-container *ngIf="!feedbackSubmitted">
+      <div class="icon">🤝</div>
+      <h2>How did it go?</h2>
+      <p>Would you like to meet this person again?</p>
+
+      <textarea
+        [(ngModel)]="feedbackNotes"
+        placeholder="Optional note (only visible to you)"
+        rows="3"
+        class="feedback-notes">
+      </textarea>
+
+      <div class="feedback-actions">
+        <button mat-raised-button color="primary" class="feedback-btn yes-btn" (click)="submitFeedback('YES')">
+          <mat-icon>thumb_up</mat-icon> Yes, meet again
+        </button>
+        <button mat-stroked-button color="warn" class="feedback-btn no-btn" (click)="submitFeedback('NO')">
+          <mat-icon>thumb_down</mat-icon> No thanks
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Feedback submitted — offer next match or back -->
+    <ng-container *ngIf="feedbackSubmitted">
+      <div class="icon">✅</div>
+      <h2>Feedback recorded!</h2>
+      <p>Want to connect with your next match right now?</p>
+
+      <!-- Next match result: connecting -->
+      <ng-container *ngIf="nextMatchResult === 'connecting'">
+        <div class="next-match-status connecting">
+          <mat-progress-spinner mode="indeterminate" diameter="32" color="accent"></mat-progress-spinner>
+          <span>Your next match is online — connecting now…</span>
+        </div>
+      </ng-container>
+
+      <!-- Next match result: no one online -->
+      <ng-container *ngIf="nextMatchResult === 'no-active'">
+        <div class="next-match-status no-active">
+          <mat-icon>mail_outline</mat-icon>
+          <span>No match is online right now. We'll notify you when one becomes available.</span>
+        </div>
+      </ng-container>
+
+      <!-- Buttons only when no result yet -->
+      <div class="after-feedback-actions" *ngIf="!nextMatchResult">
+        <button mat-raised-button color="primary" class="feedback-btn"
+                (click)="requestNextMatch()" [disabled]="requestingNext">
+          <mat-progress-spinner *ngIf="requestingNext" mode="indeterminate" diameter="18" strokeWidth="3"></mat-progress-spinner>
+          <mat-icon *ngIf="!requestingNext">skip_next</mat-icon>
+          Next Match
+        </button>
+        <button mat-stroked-button class="feedback-btn" (click)="backToList()">
+          <mat-icon>list</mat-icon> Back to Meetings
+        </button>
+      </div>
+
+      <button mat-button class="feedback-btn back-btn"
+              *ngIf="nextMatchResult" (click)="backToList()">
+        <mat-icon>list</mat-icon> Back to Meetings
+      </button>
+    </ng-container>
+
   </div>
 
 </div>

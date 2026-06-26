@@ -152,4 +152,33 @@ describe('ScheduledMatchService', () => {
     expect(currentValue(service.state$)).toBe('idle');
     expect(currentValue(service.meetingId$)).toBeNull();
   });
+
+  // TC-SC12
+  it('TC-SC12: currentMeetingId returns null before any meeting is set', () => {
+    service.connect();
+    expect(service.currentMeetingId).toBeNull();
+  });
+
+  // TC-SC13
+  it('TC-SC13: currentMeetingId returns the active meetingId after triggerWaitingRoom', () => {
+    service.connect();
+    service.triggerWaitingRoom('meeting-99', 'match-7');
+    expect(service.currentMeetingId).toBe('meeting-99');
+  });
+
+  // TC-SC14
+  it('TC-SC14: currentMeetingId returns null after resetToIdle', () => {
+    service.connect();
+    service.triggerWaitingRoom('meeting-99', 'match-7');
+    service.resetToIdle();
+    expect(service.currentMeetingId).toBeNull();
+  });
+
+  // TC-SC15
+  it('TC-SC15: currentMeetingId is set from WAITING_ROOM notification', fakeAsync(() => {
+    service.connect();
+    meetingSignals$.next(makeNotification('WAITING_ROOM', { meetingId: 'ws-meeting-5' }));
+    tick();
+    expect(service.currentMeetingId).toBe('ws-meeting-5');
+  }));
 });

@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -17,11 +18,21 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 
+import { Router } from '@angular/router';
 import { PostService, PostQuestion, PostAnswer, PostAnalyzeResponse } from '@core/services/post.service';
 import { PostMatchService, MatchNotification } from '@core/services/post-match.service';
 import { WebSocketConnectionService } from '@core/services/web-socket-connection.service';
 
-type ViewState = 'writing' | 'analyzing' | 'questions' | 'submitting' | 'waiting' | 'result';
+type ViewState =
+  | 'writing'
+  | 'analyzing'
+  | 'questions'
+  | 'submitting'
+  | 'waiting'
+  | 'connecting'      // match found AND online — WebRTC starting on scheduled-match page
+  | 'no-active-match' // match saved, no one online — email sent
+  | 'no-match'        // no candidates at all
+  | 'result';         // legacy fallback
 
 interface QuestionAnswer {
   question: PostQuestion;
@@ -37,6 +48,7 @@ interface QuestionAnswer {
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
@@ -68,6 +80,7 @@ export class PostMatchComponent implements OnInit, OnDestroy {
     private postService: PostService,
     private postMatchService: PostMatchService,
     private wsService: WebSocketConnectionService,
+    private router: Router,
     private snackBar: MatSnackBar
   ) {}
 
@@ -76,9 +89,23 @@ export class PostMatchComponent implements OnInit, OnDestroy {
     this.postMatchService.connect();
 
     this.matchSub = this.postMatchService.notification$.subscribe(n => {
-      if (n && this.viewState === 'waiting') {
-        this.matchResult = n;
-        this.viewState = 'result';
+      if (!n || this.viewState !== 'waiting') return;
+      this.matchResult = n;
+
+      switch (n.event) {
+        case 'POST_MATCH_CONNECTING':
+          // WebRTC is starting — navigate to the call screen
+          this.viewState = 'connecting';
+          setTimeout(() => this.router.navigate(['/dashboard/scheduled-match']), 1500);
+          break;
+        case 'POST_NO_ACTIVE_MATCH':
+          this.viewState = 'no-active-match';
+          break;
+        case 'POST_NO_MATCH_FOUND':
+          this.viewState = 'no-match';
+          break;
+        default:
+          this.viewState = 'result';
       }
     });
   }
