@@ -136,6 +136,7 @@ export class PostMatchComponent implements OnInit, OnDestroy {
   private handleNotification(n: MatchNotification): void {
     switch (n.event) {
       case 'POST_MATCH_CONNECTING':
+      case 'POST_MATCH_FOUND':
         this.viewState = 'connecting';
         setTimeout(() => this.router.navigate(['/dashboard/scheduled-match']), 1500);
         break;
