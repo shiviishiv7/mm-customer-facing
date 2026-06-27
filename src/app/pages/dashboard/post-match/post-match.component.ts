@@ -189,7 +189,9 @@ export class PostMatchComponent implements OnInit, OnDestroy {
   // ─── Step 2: Submit ────────────────────────────────────────────────────────
 
   submit(): void {
-    this.viewState = 'submitting';
+    // Set 'waiting' immediately so any WS notification that arrives during
+    // the HTTP round-trip is not filtered out by the viewState guard.
+    this.viewState = 'waiting';
 
     const answers: PostAnswer[] = this.questionAnswers.map(qa => ({
       questionId: qa.question.id,
@@ -198,9 +200,7 @@ export class PostMatchComponent implements OnInit, OnDestroy {
 
     this.postService.submit(this.postText, answers).subscribe({
       next: res => {
-        if (res.statusCode === 200) {
-          this.viewState = 'waiting';
-        } else {
+        if (res.statusCode !== 200) {
           this.showError(res.message || 'Submission failed.');
           this.viewState = 'questions';
         }
