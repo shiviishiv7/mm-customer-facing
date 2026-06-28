@@ -16,6 +16,7 @@ import {ApplicationRoutingEnum} from '@core/enums/application-routing-enum';
 export class ShowSettingProfileComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<ShowSettingProfileComponent>);
   email: string;
+  private sub: string;
 
   constructor(
     private router: Router,
@@ -29,6 +30,7 @@ export class ShowSettingProfileComponent implements OnInit {
     try {
       console.log("ShowSettingProfileComponent");
       this.email = this.communicationBusService.email;
+      this.sub = this.communicationBusService.sub;
     } catch (error) {
       this.handleError(error, 'Failed to load user details.');
     }
@@ -41,7 +43,7 @@ export class ShowSettingProfileComponent implements OnInit {
 
   editProfile(): void {
     try {
-      this.router.navigate(['/dashboard/profile'], {queryParams: {sub: this.email}})
+      this.router.navigate(['/dashboard/profile'], {queryParams: {sub: this.sub}})
       this.dialogRef.close()
       //    this.communicationBusService.routerNavigate('user/profile');
     } catch (error) {
