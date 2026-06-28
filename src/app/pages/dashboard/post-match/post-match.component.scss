@@ -1,5 +1,5 @@
 .post-match-wrapper {
-  max-width: 720px;
+  max-width: 860px;
   margin: 0 auto;
   padding: 32px 16px;
 }
@@ -281,38 +281,76 @@
   box-shadow: 0 4px 24px rgba(0,0,0,0.07);
 }
 
-.question-block {
-  padding: 16px 0;
-}
-
 .question-text {
   font-size: 15px;
   font-weight: 600;
   color: #1a1a2e;
   margin: 0 0 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
   line-height: 1.5;
 }
 
-.question-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #6c47ff;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  flex-shrink: 0;
-  margin-top: 1px;
+// ─── Paired two-column layout ──────────────────────────────────────────────
+
+.pair-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  min-height: 260px;
+
+  &--single {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.q-divider {
-  margin-top: 16px;
+.pair-col {
+  padding: 20px 24px;
+
+  &--you {
+    border-right: 1px solid #f0eeff;
+
+    @media (max-width: 600px) {
+      border-right: none;
+      border-bottom: 1px solid #f0eeff;
+      padding-bottom: 24px;
+    }
+  }
+
+  &--partner {
+    @media (max-width: 600px) {
+      padding-top: 24px;
+    }
+  }
+}
+
+.pair-col-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+
+  .pair-col--you & {
+    color: #6c47ff;
+    mat-icon { color: #6c47ff; }
+  }
+
+  .pair-col--partner & {
+    color: #ff6b9d;
+    mat-icon { color: #ff6b9d; }
+  }
 }
 
 // ─── Pill buttons ──────────────────────────────────────────────────────────

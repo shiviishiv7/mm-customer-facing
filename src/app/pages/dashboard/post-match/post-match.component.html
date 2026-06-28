@@ -91,95 +91,37 @@
           [class.stepper-dot--done]="si < currentStep">
         </span>
       </div>
-      <p class="stepper-progress">
-        Step {{ currentStep + 1 }} of {{ steps.length }}
-        &nbsp;·&nbsp;
-        Questions {{ stepOffset + 1 }}–{{ stepOffset + steps[currentStep]?.length }} of {{ questionAnswers.length }}
-      </p>
+      <p class="stepper-progress">Step {{ currentStep + 1 }} of {{ steps.length }}</p>
     </div>
 
     <div class="questions-card">
-      <div *ngFor="let qa of steps[currentStep]; let i = index" class="question-block">
-        <p class="question-text">
-          <span class="question-number">{{ stepOffset + i + 1 }}</span>
-          {{ qa.question.question }}
-        </p>
 
-        <!-- city — browser autocomplete, no spellcheck -->
-        <ng-container *ngIf="qa.question.type === 'city'">
-          <mat-form-field appearance="outline" class="full-width">
-            <input
-              matInput
-              [(ngModel)]="qa.value"
-              [placeholder]="qa.question.placeholder || 'Enter city name'"
-              autocomplete="address-level2"
-              spellcheck="false"
-              autocorrect="off"
-              autocapitalize="words">
-            <mat-hint>Type your city name</mat-hint>
-          </mat-form-field>
-        </ng-container>
+      <!-- Paired two-column layout: left = About You, right = Your Partner -->
+      <ng-container *ngIf="steps[currentStep] as pair">
 
-        <!-- single_choice -->
-        <ng-container *ngIf="qa.question.type === 'single_choice'">
-          <div class="pill-group">
-            <button *ngFor="let opt of qa.question.options"
-              class="pill-btn"
-              [class.pill-btn--active]="qa.value === opt"
-              (click)="qa.value = opt">{{ opt }}</button>
-          </div>
-        </ng-container>
+        <div class="pair-columns" [class.pair-columns--single]="!pair.partnerPref">
 
-        <!-- multi_choice -->
-        <ng-container *ngIf="qa.question.type === 'multi_choice'">
-          <div class="pill-group">
-            <button *ngFor="let opt of qa.question.options"
-              class="pill-btn"
-              [class.pill-btn--active]="isOptionSelected(qa, opt)"
-              (click)="toggleOption(qa, opt)">{{ opt }}</button>
-          </div>
-        </ng-container>
-
-        <!-- boolean -->
-        <ng-container *ngIf="qa.question.type === 'boolean'">
-          <div class="pill-group">
-            <button class="pill-btn" [class.pill-btn--active]="qa.value === 'true'"  (click)="qa.value = 'true'">Yes</button>
-            <button class="pill-btn" [class.pill-btn--active]="qa.value === 'false'" (click)="qa.value = 'false'">No</button>
-          </div>
-        </ng-container>
-
-        <!-- dropdown -->
-        <ng-container *ngIf="qa.question.type === 'dropdown'">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-select [(ngModel)]="qa.value">
-              <mat-option *ngFor="let opt of qa.question.options" [value]="opt">{{ opt }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </ng-container>
-
-        <!-- range -->
-        <ng-container *ngIf="qa.question.type === 'range'">
-          <div class="range-row">
-            <div class="range-field">
-              <label class="range-label">Min</label>
-              <mat-form-field appearance="outline" class="range-input">
-                <input matInput type="number" [(ngModel)]="qa.rangeMin"
-                  [min]="qa.question.min" [max]="qa.rangeMax">
-              </mat-form-field>
+          <!-- ── Left: About You ── -->
+          <div class="pair-col pair-col--you" *ngIf="pair.aboutYou as qa">
+            <div class="pair-col-header">
+              <mat-icon>person</mat-icon> About You
             </div>
-            <span class="range-sep">—</span>
-            <div class="range-field">
-              <label class="range-label">Max</label>
-              <mat-form-field appearance="outline" class="range-input">
-                <input matInput type="number" [(ngModel)]="qa.rangeMax"
-                  [min]="qa.rangeMin" [max]="qa.question.max">
-              </mat-form-field>
-            </div>
+            <p class="question-text">{{ qa.question.question }}</p>
+            <ng-container [ngTemplateOutlet]="questionInput" [ngTemplateOutletContext]="{qa: qa}"></ng-container>
           </div>
-        </ng-container>
 
-        <mat-divider *ngIf="i < steps[currentStep].length - 1" class="q-divider"></mat-divider>
-      </div>
+          <!-- ── Right: Your Partner ── -->
+          <div class="pair-col pair-col--partner" *ngIf="pair.partnerPref as qa">
+            <div class="pair-col-header">
+              <mat-icon>favorite</mat-icon> Your Partner
+            </div>
+            <p class="question-text">{{ qa.question.question }}</p>
+            <ng-container [ngTemplateOutlet]="questionInput" [ngTemplateOutletContext]="{qa: qa}"></ng-container>
+          </div>
+
+        </div>
+
+      </ng-container>
 
       <div class="step-nav">
         <button mat-stroked-button (click)="isFirstStep ? (viewState = 'writing') : prevStep()">
@@ -189,6 +131,7 @@
 
         <button *ngIf="!isLastStep"
           mat-raised-button color="primary"
+          [disabled]="!isCurrentStepValid"
           (click)="nextStep()">
           Next
           <mat-icon iconPositionEnd>arrow_forward</mat-icon>
@@ -197,11 +140,90 @@
         <button *ngIf="isLastStep"
           mat-raised-button color="primary"
           class="submit-btn"
+          [disabled]="!isCurrentStepValid"
           (click)="submit()">
           <mat-icon>send</mat-icon> Submit &amp; Find Match
         </button>
       </div>
     </div>
+
+    <!-- ── Shared question input template ── -->
+    <ng-template #questionInput let-qa="qa">
+
+      <!-- city -->
+      <ng-container *ngIf="qa.question.type === 'city'">
+        <mat-form-field appearance="outline" class="full-width">
+          <input
+            matInput
+            [(ngModel)]="qa.value"
+            [placeholder]="qa.question.placeholder || 'Enter city name'"
+            autocomplete="address-level2"
+            spellcheck="false"
+            autocorrect="off"
+            autocapitalize="words">
+          <mat-hint>Type a city name</mat-hint>
+        </mat-form-field>
+      </ng-container>
+
+      <!-- single_choice -->
+      <ng-container *ngIf="qa.question.type === 'single_choice'">
+        <div class="pill-group">
+          <button *ngFor="let opt of qa.question.options"
+            class="pill-btn"
+            [class.pill-btn--active]="qa.value === opt"
+            (click)="qa.value = opt">{{ opt }}</button>
+        </div>
+      </ng-container>
+
+      <!-- multi_choice -->
+      <ng-container *ngIf="qa.question.type === 'multi_choice'">
+        <div class="pill-group">
+          <button *ngFor="let opt of qa.question.options"
+            class="pill-btn"
+            [class.pill-btn--active]="isOptionSelected(qa, opt)"
+            (click)="toggleOption(qa, opt)">{{ opt }}</button>
+        </div>
+      </ng-container>
+
+      <!-- boolean -->
+      <ng-container *ngIf="qa.question.type === 'boolean'">
+        <div class="pill-group">
+          <button class="pill-btn" [class.pill-btn--active]="qa.value === 'true'"  (click)="qa.value = 'true'">Yes</button>
+          <button class="pill-btn" [class.pill-btn--active]="qa.value === 'false'" (click)="qa.value = 'false'">No</button>
+        </div>
+      </ng-container>
+
+      <!-- dropdown -->
+      <ng-container *ngIf="qa.question.type === 'dropdown'">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select [(ngModel)]="qa.value">
+            <mat-option *ngFor="let opt of qa.question.options" [value]="opt">{{ opt }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-container>
+
+      <!-- range -->
+      <ng-container *ngIf="qa.question.type === 'range'">
+        <div class="range-row">
+          <div class="range-field">
+            <label class="range-label">Min</label>
+            <mat-form-field appearance="outline" class="range-input">
+              <input matInput type="number" [(ngModel)]="qa.rangeMin"
+                [min]="qa.question.min" [max]="qa.rangeMax">
+            </mat-form-field>
+          </div>
+          <span class="range-sep">—</span>
+          <div class="range-field">
+            <label class="range-label">Max</label>
+            <mat-form-field appearance="outline" class="range-input">
+              <input matInput type="number" [(ngModel)]="qa.rangeMax"
+                [min]="qa.rangeMin" [max]="qa.question.max">
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+
+    </ng-template>
 
   </ng-container>
 

@@ -12,7 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 
-import { PostService, PostQuestion, PostAnswer, PostAnalyzeResponse, IntentType } from '@core/services/post.service';
+import { PostService, PostQuestion, PostAnswer, PostAnalyzeResponse, PostQuestionPair, IntentType } from '@core/services/post.service';
 
 type ViewState =
   | 'writing'
@@ -27,6 +27,11 @@ interface QuestionAnswer {
   selectedOptions: string[];
   rangeMin: number;
   rangeMax: number;
+}
+
+interface QuestionPairAnswer {
+  aboutYou: QuestionAnswer | null;
+  partnerPref: QuestionAnswer | null;
 }
 
 @Component({
@@ -47,23 +52,33 @@ export class PostMatchComponent implements OnInit, OnDestroy {
   intent: IntentType = 'MATRIMONIAL';
   postText = '';
   analyzeResult: PostAnalyzeResponse | null = null;
-  questionAnswers: QuestionAnswer[] = [];
+  questionPairAnswers: QuestionPairAnswer[] = [];
 
   currentStep = 0;
 
-  get steps(): QuestionAnswer[][] {
-    const out: QuestionAnswer[][] = [];
-    for (let i = 0; i < this.questionAnswers.length; i += 2) {
-      out.push(this.questionAnswers.slice(i, i + 2));
-    }
-    return out;
-  }
-
+  get steps(): QuestionPairAnswer[] { return this.questionPairAnswers; }
   get isFirstStep(): boolean { return this.currentStep === 0; }
   get isLastStep(): boolean  { return this.currentStep === this.steps.length - 1; }
-  get stepOffset(): number   { return this.currentStep * 2; }
 
-  nextStep(): void { if (!this.isLastStep) this.currentStep++; }
+  get isCurrentStepValid(): boolean {
+    const pair = this.steps[this.currentStep];
+    if (!pair) return true;
+    if (pair.aboutYou && !this.isAnswered(pair.aboutYou)) return false;
+    if (pair.partnerPref && !this.isAnswered(pair.partnerPref)) return false;
+    return true;
+  }
+
+  private isAnswered(qa: QuestionAnswer): boolean {
+    switch (qa.question.type) {
+      case 'multi_choice': return qa.selectedOptions.length > 0;
+      case 'range':        return true; // always has min/max
+      case 'boolean':      return true; // always has true/false
+      case 'city':         return qa.value.trim().length > 0;
+      default:             return qa.value.trim().length > 0;
+    }
+  }
+
+  nextStep(): void { if (!this.isLastStep && this.isCurrentStepValid) this.currentStep++; }
   prevStep(): void { if (!this.isFirstStep) this.currentStep--; }
 
   constructor(
@@ -90,12 +105,9 @@ export class PostMatchComponent implements OnInit, OnDestroy {
             this.submit();
             return;
           }
-          this.questionAnswers = res.data.questions.map(q => ({
-            question: q,
-            value: q.type === 'boolean' ? 'false' : '',
-            selectedOptions: [],
-            rangeMin: q.min ?? 18,
-            rangeMax: q.max ?? 60,
+          this.questionPairAnswers = res.data.questions.map(pair => ({
+            aboutYou: pair.aboutYou ? this.makeQA(pair.aboutYou) : null,
+            partnerPref: pair.partnerPref ? this.makeQA(pair.partnerPref) : null,
           }));
           this.currentStep = 0;
           this.viewState = 'questions';
@@ -114,10 +126,11 @@ export class PostMatchComponent implements OnInit, OnDestroy {
   submit(): void {
     this.viewState = 'submitting';
 
-    const answers: PostAnswer[] = this.questionAnswers.map(qa => ({
-      questionId: qa.question.id,
-      value: this.resolveValue(qa),
-    }));
+    const answers: PostAnswer[] = [];
+    for (const pair of this.questionPairAnswers) {
+      if (pair.aboutYou) answers.push({ questionId: pair.aboutYou.question.id, value: this.resolveValue(pair.aboutYou) });
+      if (pair.partnerPref) answers.push({ questionId: pair.partnerPref.question.id, value: this.resolveValue(pair.partnerPref) });
+    }
 
     this.postService.submit(this.postText, this.intent, answers).subscribe({
       next: res => {
@@ -145,6 +158,16 @@ export class PostMatchComponent implements OnInit, OnDestroy {
     return qa.selectedOptions.includes(option);
   }
 
+  private makeQA(q: PostQuestion): QuestionAnswer {
+    return {
+      question: q,
+      value: q.type === 'boolean' ? 'false' : '',
+      selectedOptions: [],
+      rangeMin: q.min ?? 18,
+      rangeMax: q.max ?? 60,
+    };
+  }
+
   private resolveValue(qa: QuestionAnswer): string {
     switch (qa.question.type) {
       case 'multi_choice': return qa.selectedOptions.join(',');
@@ -157,7 +180,7 @@ export class PostMatchComponent implements OnInit, OnDestroy {
   reset(): void {
     this.postText = '';
     this.analyzeResult = null;
-    this.questionAnswers = [];
+    this.questionPairAnswers = [];
     this.currentStep = 0;
     this.viewState = 'writing';
   }

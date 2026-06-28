@@ -7,6 +7,7 @@ export type IntentType = 'DATING' | 'MATRIMONIAL';
 
 export interface PostQuestion {
   id: string;
+  pairGroup?: string;
   question: string;
   type: 'city' | 'single_choice' | 'multi_choice' | 'range' | 'boolean' | 'dropdown';
   options?: string[];
@@ -15,10 +16,15 @@ export interface PostQuestion {
   max?: number;
 }
 
+export interface PostQuestionPair {
+  aboutYou: PostQuestion | null;
+  partnerPref: PostQuestion | null;
+}
+
 export interface PostAnalyzeResponse {
   inferredCategory: string;
   categoryDisplayName: string;
-  questions: PostQuestion[];
+  questions: PostQuestionPair[];
 }
 
 export interface PostAnswer {
