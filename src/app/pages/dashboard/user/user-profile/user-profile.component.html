@@ -1,240 +1,187 @@
 <div class="container py-4">
   <div class="row justify-content-center">
-    <div class="col-lg-10 col-xl-9">
+    <div class="col-lg-8 col-xl-7">
 
-      <!-- Top Section Header -->
-      <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-light">
-        <div>
-          <h2 class="h3 font-weight-bold mb-0 text-indigo" style="color: #1e1b4b; font-weight: 700;">User Profile Management</h2>
-          <p class="text-muted small mb-0">View or modify onboarding parameters safely</p>
-        </div>
+      <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+        <mat-icon class="me-2" style="color:#6c47ff;">person</mat-icon>
+        <h2 class="h4 mb-0 fw-bold" style="color:#1a1a2e;">My Profile</h2>
       </div>
 
-      <!-- State 1: User Not Found Interface Banner -->
+      <!-- State 1: Loading / not found -->
       <ng-container *ngIf="current === 1">
-        <div class="alert shadow-sm border-0 p-4 text-center d-flex flex-column align-items-center justify-content-center"
-             style="background-color: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b !important; border-radius: 0.75rem;">
-          <mat-icon style="color: #d97706; font-size: 32px; width: 32px; height: 32px;" class="mb-2">warning</mat-icon>
-          <h4 class="h6 font-weight-bold text-dark mb-1">Account Synchronization Pending</h4>
-          <p class="text-muted small mb-0">The requested identity profile mapping does not exist in our matching directory database layer.</p>
+        <div class="alert text-center p-4" style="background:#fff8e1;border-left:4px solid #f59e0b;border-radius:12px;">
+          <mat-icon style="color:#d97706;font-size:32px;width:32px;height:32px;" class="mb-2">warning</mat-icon>
+          <h4 class="h6 fw-bold text-dark mb-1">Profile not found</h4>
+          <p class="text-muted small mb-0">Loading your profile…</p>
         </div>
       </ng-container>
 
-      <!-- State 2: Edit or Add User Details Interactive Form -->
+      <!-- State 2: Edit form -->
       <ng-container *ngIf="current === 2">
-        <mat-card class="shadow-sm border-0 p-3 rounded-lg bg-white">
-          <mat-card-header class="mb-4">
-            <mat-card-title class="h5 font-weight-bold mb-1" style="color: #312e81;">Edit Profile Parameters</mat-card-title>
-            <mat-card-subtitle class="text-muted small">Ensure all required fields match official corporate credentials.</mat-card-subtitle>
-          </mat-card-header>
+        <mat-card class="shadow-sm border-0 p-3 rounded-3">
 
-          <mat-card-content>
-            <form #userForm="ngForm" class="row g-3">
+          <div *ngIf="!user?.isProfileComplete" class="alert mb-3 p-3"
+               style="background:#f0eeff;border-left:4px solid #6c47ff;border-radius:8px;">
+            <mat-icon style="color:#6c47ff;vertical-align:middle;">info</mat-icon>
+            <span class="ms-2" style="color:#3b1fa8;font-size:14px;">
+              Please fill in your <strong>full name, date of birth, gender, city and state</strong> to activate matching.
+            </span>
+          </div>
 
-              <!-- Divider Header: Personal Details -->
-              <div class="col-12 mt-2 mb-1">
-                <div class="d-flex align-items-center text-indigo font-weight-bold gap-2" style="color: #4338ca; font-size: 0.9rem; tracking-spacing: 0.05em;">
-                  <mat-icon style="font-size: 18px; width:18px; height:18px;">badge</mat-icon>
-                  <span>PERSONAL CREDENTIALS</span>
-                </div>
-                <hr class="mt-2 mb-1" style="border-color: #e2e8f0;"/>
-              </div>
+          <form #userForm="ngForm" class="row g-3">
 
-              <!-- First Name -->
-              <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>First Name</mat-label>
-                  <input matInput type="text" name="firstName" [(ngModel)]="user.firstName" #firstName="ngModel" required />
-                  <mat-error *ngIf="firstName.invalid && firstName.touched">First name field is required.</mat-error>
-                </mat-form-field>
-              </div>
+            <!-- Full Name -->
+            <div class="col-12">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Full Name</mat-label>
+                <input matInput type="text" name="name" [(ngModel)]="user.name"
+                       #nameField="ngModel" required minlength="2"/>
+                <mat-error *ngIf="nameField.invalid && nameField.touched">Full name is required.</mat-error>
+              </mat-form-field>
+            </div>
 
-              <!-- Last Name -->
-              <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Last Name</mat-label>
-                  <input matInput type="text" name="lastName" [(ngModel)]="user.lastName" #lastName="ngModel" required />
-                  <mat-error *ngIf="lastName.invalid && lastName.touched">Last name field is required.</mat-error>
-                </mat-form-field>
-              </div>
+            <!-- Gender + DOB -->
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Gender</mat-label>
+                <mat-select name="gender" [(ngModel)]="user.gender" #gender="ngModel" required>
+                  <mat-option value="MALE">Male</mat-option>
+                  <mat-option value="FEMALE">Female</mat-option>
+                  <mat-option value="NON_BINARY">Non-Binary</mat-option>
+                  <mat-option value="PREFER_NOT_TO_SAY">Prefer not to say</mat-option>
+                </mat-select>
+                <mat-error *ngIf="gender.invalid && gender.touched">Gender is required.</mat-error>
+              </mat-form-field>
+            </div>
 
-              <!-- Company ID -->
-              <div class="col-md-4">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Company ID</mat-label>
-                  <input matInput type="text" name="companyId" [(ngModel)]="user.companyId" #companyId="ngModel" required />
-                  <mat-error *ngIf="companyId.invalid && companyId.touched">Company ID is required.</mat-error>
-                </mat-form-field>
-              </div>
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Date of Birth</mat-label>
+                <input matInput [matDatepicker]="picker" name="dateOfBirth"
+                       [(ngModel)]="user.dateOfBirth" required #dob="ngModel"/>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="dob.invalid && dob.touched">Date of birth is required.</mat-error>
+              </mat-form-field>
+            </div>
 
-              <!-- Gender Selection -->
-              <div class="col-md-4">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Gender Alignment</mat-label>
-                  <mat-select name="gender" [(ngModel)]="user.gender" #gender="ngModel" required>
-                    <mat-option value="MALE">Male</mat-option>
-                    <mat-option value="FEMALE">Female</mat-option>
-                    <mat-option value="NON_BINARY">Non-Binary</mat-option>
-                    <mat-option value="PREFER_NOT_TO_SAY">Prefer Not to Say</mat-option>
-                  </mat-select>
-                  <mat-error *ngIf="gender.invalid && gender.touched">Gender identity parameter is required.</mat-error>
-                </mat-form-field>
-              </div>
+            <!-- City + State -->
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>City</mat-label>
+                <input matInput type="text" name="currentCity" [(ngModel)]="user.currentCity"
+                       #city="ngModel" required/>
+                <mat-error *ngIf="city.invalid && city.touched">City is required.</mat-error>
+              </mat-form-field>
+            </div>
 
-              <!-- Date of Birth -->
-              <div class="col-md-4">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Date of Birth</mat-label>
-                  <input matInput [matDatepicker]="picker" name="dateOfBirth" [(ngModel)]="user.dateOfBirth">
-                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
-              </div>
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>State / Region</mat-label>
+                <input matInput type="text" name="currentState" [(ngModel)]="user.currentState"
+                       #state="ngModel" required/>
+                <mat-error *ngIf="state.invalid && state.touched">State is required.</mat-error>
+              </mat-form-field>
+            </div>
 
-              <!-- Divider Header: Corporate Locality Data -->
-              <div class="col-12 mt-4 mb-1">
-                <div class="d-flex align-items-center text-indigo font-weight-bold gap-2" style="color: #4338ca; font-size: 0.9rem; tracking-spacing: 0.05em;">
-                  <mat-icon style="font-size: 18px; width:18px; height:18px;">place</mat-icon>
-                  <span>LOCALITY & GEOGRAPHY DETAILS</span>
-                </div>
-                <hr class="mt-2 mb-1" style="border-color: #e2e8f0;"/>
-              </div>
+            <!-- Country -->
+            <div class="col-12">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Country</mat-label>
+                <input matInput type="text" name="currentCountry" [(ngModel)]="user.currentCountry"/>
+              </mat-form-field>
+            </div>
 
-              <!-- Street Address -->
-              <div class="col-md-12">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Street Address</mat-label>
-                  <textarea matInput name="streetAddress" [(ngModel)]="user.addressVO!.streetAddress" rows="2"></textarea>
-                </mat-form-field>
-              </div>
+            <!-- Tagline -->
+            <div class="col-12">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Tagline <span class="text-muted">(optional)</span></mat-label>
+                <input matInput type="text" name="tagline" [(ngModel)]="user.tagline" maxlength="200"/>
+                <mat-hint align="end">{{ user?.tagline?.length || 0 }}/200</mat-hint>
+              </mat-form-field>
+            </div>
 
-              <!-- City -->
-              <div class="col-md-3 col-sm-6">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>City</mat-label>
-                  <input matInput type="text" name="city" [(ngModel)]="user.addressVO!.city"/>
-                </mat-form-field>
-              </div>
+            <!-- About Me -->
+            <div class="col-12">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>About Me <span class="text-muted">(optional)</span></mat-label>
+                <textarea matInput name="aboutMe" [(ngModel)]="user.aboutMe" rows="3"></textarea>
+              </mat-form-field>
+            </div>
 
-              <!-- State -->
-              <div class="col-md-3 col-sm-6">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>State / Region</mat-label>
-                  <input matInput type="text" name="state" [(ngModel)]="user.addressVO!.state"/>
-                </mat-form-field>
-              </div>
+            <!-- Actions -->
+            <div class="col-12 d-flex gap-2 justify-content-end pt-2 border-top">
+              <button *ngIf="user?.isProfileComplete" mat-stroked-button type="button" (click)="current = 3">
+                Cancel
+              </button>
+              <button mat-raised-button color="primary" type="button"
+                      (click)="submitForm(userForm)"
+                      [disabled]="userForm.invalid">
+                <mat-icon>save</mat-icon> Save Profile
+              </button>
+            </div>
 
-              <!-- Country -->
-              <div class="col-md-3 col-sm-6">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>Country</mat-label>
-                  <input matInput type="text" name="country" [(ngModel)]="user.addressVO!.country"/>
-                </mat-form-field>
-              </div>
-
-              <!-- ZIP/Postal -->
-              <div class="col-md-3 col-sm-6">
-                <mat-form-field appearance="outline" class="w-100">
-                  <mat-label>ZIP / Postal Code</mat-label>
-                  <input matInput type="text" name="zip" [(ngModel)]="user.addressVO!.zip" #zip="ngModel" maxlength="10" />
-                  <mat-error *ngIf="zip.invalid && zip.touched">Must be a valid ZIP / postal code.</mat-error>
-                </mat-form-field>
-              </div>
-
-              <!-- Core Execution Form Actions Bar -->
-              <div class="col-12 text-right mt-4 pt-2 border-top border-light">
-                <button mat-raised-button
-                        style="background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border-radius: 0.5rem; min-width: 120px;"
-                        (click)="submitForm(userForm)"
-                        [disabled]="userForm.invalid"
-                        matTooltip="Commit payload state modifications">
-                  Save Verification Changes
-                </button>
-              </div>
-            </form>
-          </mat-card-content>
+          </form>
         </mat-card>
       </ng-container>
 
-      <!-- State 3: Clean Read-Only Structured Overview Grid -->
+      <!-- State 3: Read-only view -->
       <ng-container *ngIf="current === 3 && user">
-        <mat-card class="shadow-sm border-0 p-3 rounded-lg bg-white">
-          <mat-card-header class="mb-3">
-            <mat-card-title class="h5 font-weight-bold text-dark mb-1">Corporate Overview</mat-card-title>
-            <mat-card-subtitle class="text-muted small">Verified profile attributes currently active within matching pools.</mat-card-subtitle>
-          </mat-card-header>
+        <mat-card class="shadow-sm border-0 p-3 rounded-3">
 
-          <mat-card-content>
-            <div class="table-responsive rounded border border-light">
-              <table class="table table-striped table-hover mb-0" style="font-size: 0.9rem;">
-                <tbody>
-                <tr>
-                  <th scope="row" class="text-secondary font-weight-medium border-0 py-3 pl-4" style="width: 30%;">Full Name</th>
-                  <td class="font-weight-bold text-dark border-0 py-3">{{ user.firstName }} {{ user.lastName }}</td>
-                </tr>
-                <tr>
-                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Cognito Mapping Identity</th>
-                  <td class="text-muted font-monospace py-3" style="font-size: 0.85rem;">{{ user.cognitoSub }}</td>
-                </tr>
-                <tr>
-                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Company ID</th>
-                  <td class="text-dark py-3">{{ user.companyId || 'Not Configured' }}</td>
-                </tr>
-                <tr>
-                  <th scope="row" class="text-secondary font-weight-medium py-3 pl-4">Office Locality Bounds</th>
-                  <td class="text-dark py-3">
-                    <span *ngIf="user.addressVO?.streetAddress">{{ user.addressVO?.streetAddress }}, </span>
-                    <span>{{ user.addressVO?.city }}</span>
-                    <span *ngIf="user.addressVO?.state">, {{ user.addressVO?.state }}</span>
-                    <span *ngIf="user.addressVO?.zip"> - {{ user.addressVO?.zip }}</span>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </mat-card-content>
-
-          <!-- System Layout Management Actions Dashboard -->
-          <mat-card-actions class="d-flex flex-wrap align-items-center justify-content-between p-3 mt-3 border-top border-light gap-2">
-
-            <div class="d-flex gap-2">
-              <ng-container *ngIf="!adminUser">
-                <button mat-raised-button
-                        style="background-color: #312e81; color: white;"
-                        (click)="current = 2"
-                        matTooltip="Modify structural attribute keys">
-                  <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">edit</mat-icon>
-                  Modify Parameters
-                </button>
-              </ng-container>
-
-              <button mat-raised-button
-                      style="background-color: #475569; color: white;"
-                      (click)="viewUserAttempt(user)"
-                      matTooltip="Inspect pool connection event arrays">
-                <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">visibility</mat-icon>
-                View Match Attempts
-              </button>
-
-              <ng-container *ngIf="adminUser">
-                <button mat-raised-button
-                        style="background-color: #4338ca; color: white;"
-                        matTooltip="Configure matching pool allowance profiles">
-                  <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">update</mat-icon>
-                  Manage Exam Pools
-                </button>
-              </ng-container>
-            </div>
-
-            <button mat-raised-button
-                    color="warn"
-                    (click)="removeUserFromInstitution(user)"
-                    matTooltip="Terminate workspace session associations safely">
-              <mat-icon style="font-size: 18px; width:18px; height:18px;" class="mr-1">logout</mat-icon>
-              Leave Space
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <span class="fw-semibold" style="color:#1a1a2e;">Profile Overview</span>
+            <button mat-stroked-button (click)="current = 2">
+              <mat-icon>edit</mat-icon> Edit
             </button>
+          </div>
 
-          </mat-card-actions>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="profile-field-label">Full Name</div>
+              <div class="profile-field-value">{{ user.name || '—' }}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="profile-field-label">Gender</div>
+              <div class="profile-field-value">{{ user.gender || '—' }}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="profile-field-label">Date of Birth</div>
+              <div class="profile-field-value">{{ user.dateOfBirth || '—' }}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="profile-field-label">Email</div>
+              <div class="profile-field-value">{{ user.email || '—' }}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="profile-field-label">City</div>
+              <div class="profile-field-value">{{ user.currentCity || '—' }}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="profile-field-label">State</div>
+              <div class="profile-field-value">{{ user.currentState || '—' }}</div>
+            </div>
+            <div class="col-12" *ngIf="user.tagline">
+              <div class="profile-field-label">Tagline</div>
+              <div class="profile-field-value">{{ user.tagline }}</div>
+            </div>
+            <div class="col-12" *ngIf="user.aboutMe">
+              <div class="profile-field-label">About Me</div>
+              <div class="profile-field-value">{{ user.aboutMe }}</div>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2 border-top">
+            <span class="badge"
+                  [style.background]="user.isProfileComplete ? '#d1fae5' : '#fff3cd'"
+                  [style.color]="user.isProfileComplete ? '#065f46' : '#92400e'">
+              <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle;">
+                {{ user.isProfileComplete ? 'check_circle' : 'warning' }}
+              </mat-icon>
+              {{ user.isProfileComplete ? 'Profile complete' : 'Profile incomplete — matching is paused' }}
+            </span>
+          </div>
+
         </mat-card>
       </ng-container>
 

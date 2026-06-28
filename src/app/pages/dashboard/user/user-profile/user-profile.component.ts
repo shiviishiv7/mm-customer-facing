@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserModel} from '@core/models/class/user-model';
 import {finalize, Subscription} from 'rxjs';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -16,13 +16,12 @@ import {AuthService} from '@core/services/auth.service';
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent implements OnInit, OnDestroy {
 
   current = 1;
   user: UserModel;
   private subscriptions: Subscription = new Subscription();
   private sub: string | null = null;
-  private matDialogRef: MatDialogRef<any>;
   adminUser: boolean = false;
 
   constructor(
@@ -34,46 +33,32 @@ export class UserProfileComponent implements OnInit {
     private route: ActivatedRoute,
     private communicationBusService: CommunicationBusService,
     private authService: AuthService
-  ) {
-  }
-
-  // createUser removed — user creation is handled by AWS Lambda post-Cognito signup
+  ) {}
 
   submitForm(form: NgForm): void {
     try {
       if (!form.valid) {
-        this.notificationService.error('Form is invalid. Please fix the errors and try again.');
+        this.notificationService.error('Please fill in all required fields.');
         return;
       }
 
-      // Compute age from dateOfBirth before sending to backend
+      // Normalize dateOfBirth to YYYY-MM-DD
       if (this.user.dateOfBirth) {
         const dob = new Date(this.user.dateOfBirth);
-        const today = new Date();
-        let age = today.getFullYear() - dob.getFullYear();
-        const monthDiff = today.getMonth() - dob.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-          age--;
-        }
-        this.user.age = age;
-        // Normalize to YYYY-MM-DD string for backend
         this.user.dateOfBirth = dob.toISOString().split('T')[0];
-      }
-
-      if (!this.objectValidationService.userValidate(this.user)) {
-        return;
       }
 
       this.communicationBusService.showProgressBar();
 
-      // Always update — user record is created by AWS Lambda on Cognito signup
       this.userService.updateUser(this.user)
         .pipe(finalize(() => this.communicationBusService.closeProgressBar()))
         .subscribe({
           next: (res) => {
             this.user = res.data ?? this.user;
+            // Update shared bus so dashboard banner refreshes
+            this.communicationBusService.user = this.user;
             this.current = 3;
-            this.notificationService.success('User data saved successfully!');
+            this.notificationService.success('Profile saved successfully!');
           },
           error: (err) => {
             this.notificationService.error(err.error?.message || err.message || 'An unexpected error occurred.');
@@ -117,12 +102,11 @@ export class UserProfileComponent implements OnInit {
               return;
             }
             this.user = data;
-            if (!this.user.addressVO) this.user.addressVO = {};
-            this.current = 3;
+            // Go straight to edit mode if profile is not yet complete
+            this.current = this.user.isProfileComplete ? 3 : 2;
           },
           error: (err) => {
-            // User not found means Lambda post-signup hook hasn't run yet or failed
-            if (err.status === 404 || err.error?.message === 'User does not exist') {
+            if (err.status === 404) {
               this.notificationService.error('Your profile is not set up yet. Please contact support.');
             } else {
               this.notificationService.error(err.error?.message || 'Failed to load profile.');
@@ -133,14 +117,6 @@ export class UserProfileComponent implements OnInit {
       this.notificationService.error('An unexpected error occurred during initialization.');
       this.communicationBusService.closeProgressBar();
     }
-  }
-
-  removeUserFromInstitution(user: UserModel) {
-    this.communicationBusService.routerNavigate('/dashboard/instant-match');
-  }
-
-  viewUserAttempt(user: UserModel) {
-    this.communicationBusService.routerNavigate('/dashboard/attempt-history');
   }
 
   backToPreviousPage() {
