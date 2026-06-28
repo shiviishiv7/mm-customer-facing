@@ -102,21 +102,21 @@
         <div class="pair-columns" [class.pair-columns--single]="!pair.partnerPref">
 
           <!-- ── Left: About You ── -->
-          <div class="pair-col pair-col--you" *ngIf="pair.aboutYou as qa">
+          <div class="pair-col pair-col--you" *ngIf="pair.aboutYou">
             <div class="pair-col-header">
               <mat-icon>person</mat-icon> About You
             </div>
-            <p class="question-text">{{ qa.question.question }}</p>
-            <ng-container [ngTemplateOutlet]="questionInput" [ngTemplateOutletContext]="{qa: qa}"></ng-container>
+            <p class="question-text">{{ pair.aboutYou.question.question }}</p>
+            <ng-container *ngTemplateOutlet="questionInput; context: { $implicit: pair.aboutYou }"></ng-container>
           </div>
 
           <!-- ── Right: Your Partner ── -->
-          <div class="pair-col pair-col--partner" *ngIf="pair.partnerPref as qa">
+          <div class="pair-col pair-col--partner" *ngIf="pair.partnerPref">
             <div class="pair-col-header">
               <mat-icon>favorite</mat-icon> Your Partner
             </div>
-            <p class="question-text">{{ qa.question.question }}</p>
-            <ng-container [ngTemplateOutlet]="questionInput" [ngTemplateOutletContext]="{qa: qa}"></ng-container>
+            <p class="question-text">{{ pair.partnerPref.question.question }}</p>
+            <ng-container *ngTemplateOutlet="questionInput; context: { $implicit: pair.partnerPref }"></ng-container>
           </div>
 
         </div>
@@ -148,7 +148,7 @@
     </div>
 
     <!-- ── Shared question input template ── -->
-    <ng-template #questionInput let-qa="qa">
+    <ng-template #questionInput let-qa>
 
       <!-- city -->
       <ng-container *ngIf="qa.question.type === 'city'">
