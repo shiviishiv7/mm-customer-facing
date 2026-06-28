@@ -4,16 +4,17 @@ import { DashboardComponent } from './dashboard.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
 import { ScheduledMatchComponent } from './scheduled-match/scheduled-match.component';
 import { PostMatchComponent } from './post-match/post-match.component';
+import { profileCompleteGuard } from '@core/guards/profile-complete.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: DashboardComponent,
     children: [
-      { path: 'post-match',      component: PostMatchComponent,     pathMatch: 'full' },
-      { path: 'scheduled-match', component: ScheduledMatchComponent, pathMatch: 'full' },
-      { path: 'profile',         component: UserProfileComponent,    pathMatch: 'full' },
-      { path: '',                redirectTo: 'post-match',           pathMatch: 'full' },
+      { path: 'post-match',      component: PostMatchComponent,      pathMatch: 'full', canActivate: [profileCompleteGuard] },
+      { path: 'scheduled-match', component: ScheduledMatchComponent,  pathMatch: 'full' },
+      { path: 'profile',         component: UserProfileComponent,     pathMatch: 'full' },
+      { path: '',                redirectTo: 'post-match',            pathMatch: 'full' },
     ],
   },
 ];
