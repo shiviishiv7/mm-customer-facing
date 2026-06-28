@@ -1,72 +1,85 @@
+<div class="landing-wrapper">
 
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">💼 For Working Professionals</div>
 
-<div class="container text-center py-5">
-  <div class="row justify-content-center my-4">
-    <div class="col-lg-8">
+    <h1 class="hero-title">
+      Find Your<br>
+      <span class="hero-accent">Life Partner</span>
+    </h1>
 
-      <span class="d-inline-block text-uppercase font-weight-bold text-primary mb-4 px-3 py-1 rounded-pill bg-light border"
-            style="font-size: 0.75rem; tracking-spacing: 0.05em; color: #6366f1 !important; background-color: rgba(99, 102, 241, 0.1) !important; border-color: rgba(99, 102, 241, 0.2) !important;">
-        🚀 Serendipitous Professional Matchmaking
-      </span>
+    <p class="hero-subtitle">
+      Dating and matrimonial matching built for people with careers.
+      Write a post, answer a few questions, and we'll find your best match
+      and schedule a Zoom meeting — no swiping, no endless scrolling.
+    </p>
 
-      <h1 class="display-4 font-weight-extrabold text-dark mb-4" style="font-weight: 800; tracking-tight: -0.03em;">
-        Break the Silo.<br>
-        <span class="text-muted" style="color: #4b5563 !important;">Expand Your Network, One Random Connection at a Time.</span>
-      </h1>
-
-      <p class="lead text-secondary max-w-2xl mx-auto mb-5" style="color: #6b7280 !important; font-size: 1.15rem;">
-        Welcome to a networking space built exclusively for professionals. No endless scrolling, no awkward cold pitches—just meaningful, randomized conversations with verified peers from across industries.
-      </p>
-
-      <div class="card shadow-lg mx-auto p-4 mb-5 border-0 rounded-lg bg-white text-dark" style="max-width: 440px; border-radius: 1rem !important;">
-        <div class="card-body">
-          <h3 class="h5 card-title font-weight-bold text-dark mb-2">Ready to explore the network?</h3>
-          <p class="card-text text-muted small mb-4">Verify your corporate workspace email alignment and enter the active matchmaking pool safely.</p>
-
-          <button [disabled]="isLoading"
-                  mat-raised-button
-                  color="primary"
-                  class="btn-block py-2 text-white font-weight-medium position-relative d-flex align-items-center justify-content-center"
-                  style="border-radius: 0.5rem; background: linear-gradient(135deg, #6366f1, #a855f7); font-size: 1rem; border: none; min-height: 48px;"
-                  (click)="startAuthentication()">
-
-            <span *ngIf="!isLoading" class="font-weight-bold tracking-wide">Explore Connection</span>
-
-            <ng-container *ngIf="isLoading">
-              <app-loading-dialog></app-loading-dialog>
-            </ng-container>
-          </button>
-        </div>
-      </div>
-
+    <div class="hero-cta">
+      <button [disabled]="isLoading"
+              mat-raised-button
+              color="primary"
+              class="cta-btn"
+              (click)="startAuthentication()">
+        <span *ngIf="!isLoading">Get Started — It's Free</span>
+        <app-loading-dialog *ngIf="isLoading"></app-loading-dialog>
+      </button>
+      <p class="cta-sub">No credit card required</p>
     </div>
   </div>
 
-  <div class="row text-left mt-5 pt-4 border-top border-light">
+  <!-- How it works -->
+  <div class="how-it-works">
+    <h2 class="section-title">How it works</h2>
 
-    <div class="col-md-4 mb-4">
-      <div class="p-3">
-        <div class="d-flex align-items-center justify-content-center rounded mb-3 bg-light border" style="width: 40px; height: 40px;">🛡️</div>
-        <h4 class="h6 font-weight-bold text-dark mb-2">100% Verified Employees</h4>
-        <p class="text-muted small mb-0">Every member is strictly authenticated via their active corporate email architecture. No spam, no phantom bots, no cold recruiters.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-icon">✍️</div>
+        <h3>Write a post</h3>
+        <p>Tell us about yourself and what you're looking for. Choose dating or matrimonial.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-icon">🤝</div>
+        <h3>We find your match</h3>
+        <p>Our system scans profiles every 15 minutes and finds your most compatible match.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-icon">📧</div>
+        <h3>Get a Zoom invite</h3>
+        <p>Both of you receive a Zoom meeting link by email — no app install needed.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-icon">💬</div>
+        <h3>Meet &amp; decide</h3>
+        <p>Have a 30-minute video call. If both of you want to meet again, we schedule the next one.</p>
       </div>
     </div>
-
-    <div class="col-md-4 mb-4">
-      <div class="p-3">
-        <div class="d-flex align-items-center justify-content-center rounded mb-3 bg-light border" style="width: 40px; height: 40px;">☕</div>
-        <h4 class="h6 font-weight-bold text-dark mb-2">Serendipitous Discovery</h4>
-        <p class="text-muted small mb-0">Skip the social anxiety of structured outreach. Our engine pairs you dynamically for spontaneous, productive conversations.</p>
-      </div>
-    </div>
-
-    <div class="col-md-4 mb-4">
-      <div class="p-3">
-        <div class="d-flex align-items-center justify-content-center rounded mb-3 bg-light border" style="width: 40px; height: 40px;">🎯</div>
-        <h4 class="h6 font-weight-bold text-dark mb-2">Cross-Functional Growth</h4>
-        <p class="text-muted small mb-0">Discuss architecture trends, share ecosystem scaling insights, or talk shop outside your immediate team bubble.</p>
-      </div>
-    </div>
-
   </div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <h4>Working Professionals Only</h4>
+      <p>Every member is a verified working professional — no spam, no bots.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💑</div>
+      <h4>Dating &amp; Matrimonial</h4>
+      <p>Whether you're looking to date or find a life partner, we have the right flow for you.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h4>Quality over Quantity</h4>
+      <p>Up to 5 curated matches per post — not thousands of low-quality connections.</p>
+    </div>
+  </div>
+
 </div>

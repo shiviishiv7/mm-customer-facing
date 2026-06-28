@@ -3,7 +3,7 @@
     <div class="col-12 border-danger shadow-lg rounded-2">
 
       <mat-drawer-container class="bg-light">
-        <!-- Drawer Section -->
+        <!-- Drawer -->
         <mat-drawer #drawer class="styled-drawer" mode="side" [opened]="!commBus.isMobileView()">
           <div class="link-container mt-4">
             <ul class="nav flex-column">
@@ -24,50 +24,25 @@
                 <button
                   (click)="commBus.isMobileView() && drawer.close()"
                   class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.CHAT_BOT"
+                  [routerLink]="ApplicationRoutingEnum.SCHEDULED_MATCH"
                   routerLinkActive="active">
-                  <mat-icon class="me-2">smart_toy</mat-icon>
-                  Chat & Match
+                  <mat-icon class="me-2">video_camera_front</mat-icon>
+                  My Meetings
                 </button>
               </li>
-
-              <li class="nav-item">
-                <button
-                  (click)="commBus.isMobileView() && drawer.close()"
-                  class="btn btn-primary w-100 mb-2"
-                  [routerLink]="ApplicationRoutingEnum.INSTANCE_MEETING"
-                  routerLinkActive="active">
-                  <mat-icon class="me-2">flash_on</mat-icon>
-                  Instant Meeting
-                </button>
-              </li>
-
-<!--              <li class="nav-item">-->
-<!--                <button-->
-<!--                  (click)="commBus.isMobileView() && drawer.close()"-->
-<!--                  class="btn btn-primary w-100 mb-2"-->
-<!--                  [routerLink]="ApplicationRoutingEnum.SCHEDULED_MATCH"-->
-<!--                  routerLinkActive="active">-->
-<!--                  <mat-icon class="me-2">event</mat-icon>-->
-<!--                  Schedule Meeting-->
-<!--                </button>-->
-<!--              </li>-->
 
             </ul>
           </div>
         </mat-drawer>
 
-        <!-- Main Content Section -->
+        <!-- Main Content -->
         <mat-drawer-content class="mat-drawer-content">
           <router-outlet></router-outlet>
-          <!--          hello world-->
         </mat-drawer-content>
       </mat-drawer-container>
 
-      <!--      &lt;!&ndash; Floating Action Button &ndash;&gt;-->
       <app-fab-button-dashboard [drawer]="drawer"></app-fab-button-dashboard>
 
     </div>
   </div>
 </div>
-

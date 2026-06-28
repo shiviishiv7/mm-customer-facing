@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
+export type IntentType = 'DATING' | 'MATRIMONIAL';
+
 export interface PostQuestion {
   id: string;
   question: string;
@@ -24,9 +26,35 @@ export interface PostAnswer {
   value: string;
 }
 
+export interface PartnerPreferenceRequest {
+  ageMin?: number;
+  ageMax?: number;
+  heightMinCm?: number;
+  heightMaxCm?: number;
+  genderPref?: string;
+  maritalStatusPref?: string;
+  preferredStates?: string;
+  openToRelocation?: boolean;
+  religionPref?: string;
+  motherTonguePref?: string;
+  dietaryPref?: string;
+  educationPref?: string;
+  employmentTypePref?: string;
+  incomeMinInr?: number;
+  incomeMaxInr?: number;
+  smokingPref?: string;
+  drinkingPref?: string;
+  familyTypePref?: string;
+  familyValuesPref?: string;
+  wantsChildrenPref?: boolean;
+  marriageTimelinePref?: string;
+  okWithPartnerWorkingPref?: boolean;
+  relationshipGoalPref?: string;
+  aboutPartner?: string;
+}
+
 export interface PostSubmitResponse {
   postId: number;
-  inferredCategory: string;
   categoryDisplayName: string;
   profileUpdated: boolean;
 }
@@ -44,17 +72,26 @@ export class PostService {
 
   constructor(private http: HttpClient) {}
 
-  analyze(postText: string): Observable<BaseVO<PostAnalyzeResponse>> {
+  analyze(postText: string, intent: IntentType): Observable<BaseVO<PostAnalyzeResponse>> {
     return this.http.post<BaseVO<PostAnalyzeResponse>>(
       `${this.baseURL}${this.path}/analyze`,
-      { postText }
+      { postText, intent }
     );
   }
 
-  submit(postText: string, answers: PostAnswer[]): Observable<BaseVO<PostSubmitResponse>> {
+  submit(
+    postText: string,
+    intent: IntentType,
+    answers: PostAnswer[],
+    partnerPreference?: PartnerPreferenceRequest
+  ): Observable<BaseVO<PostSubmitResponse>> {
     return this.http.post<BaseVO<PostSubmitResponse>>(
       `${this.baseURL}${this.path}/submit`,
-      { postText, answers }
+      { postText, intent, answers, partnerPreference }
     );
+  }
+
+  closePost(postId: number): Observable<BaseVO<void>> {
+    return this.http.delete<BaseVO<void>>(`${this.baseURL}${this.path}/${postId}`);
   }
 }

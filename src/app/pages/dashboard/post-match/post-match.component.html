@@ -4,22 +4,43 @@
   <ng-container *ngIf="viewState === 'writing'">
     <div class="screen-header">
       <div class="header-icon">
-        <mat-icon>edit_note</mat-icon>
+        <mat-icon>favorite</mat-icon>
       </div>
-      <h1 class="screen-title">Write Your <span class="accent">Post</span></h1>
+      <h1 class="screen-title">Find Your <span class="accent">Match</span></h1>
       <p class="screen-subtitle">
-        Tell us about yourself and what you're looking for. Be genuine — our AI will help fill in the rest.
+        Select what you're looking for, write a little about yourself, and we'll handle the rest.
       </p>
     </div>
 
     <div class="input-card">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Your post</mat-label>
+
+      <!-- Intent selector -->
+      <div class="intent-row">
+        <button
+          class="intent-btn"
+          [class.intent-btn--active]="intent === 'MATRIMONIAL'"
+          (click)="intent = 'MATRIMONIAL'">
+          <mat-icon>ring_volume</mat-icon>
+          Matrimonial
+        </button>
+        <button
+          class="intent-btn"
+          [class.intent-btn--active]="intent === 'DATING'"
+          (click)="intent = 'DATING'">
+          <mat-icon>favorite_border</mat-icon>
+          Dating
+        </button>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width" style="margin-top:20px">
+        <mat-label>Tell us about yourself</mat-label>
         <textarea
           matInput
           [(ngModel)]="postText"
-          placeholder="E.g. 27M | Delhi | Looking for a life partner who values sincerity over charm. I enjoy meaningful conversations,  and work in tech. Open to meeting families once comfortable..."
-          rows="12"
+          [placeholder]="intent === 'MATRIMONIAL'
+            ? 'E.g. 28M | Delhi | Software engineer looking for a life partner who values family and sincerity...'
+            : 'E.g. 26F | Mumbai | Looking for someone genuine to date. I love hiking, coffee and good conversations...'"
+          rows="10"
           class="post-textarea">
         </textarea>
         <mat-hint>{{ postText.length }} characters · minimum 50</mat-hint>
@@ -32,7 +53,7 @@
         (click)="analyze()"
         [disabled]="!isPostValid">
         <mat-icon>auto_awesome</mat-icon>
-        Analyze & Continue
+        Continue
       </button>
     </div>
   </ng-container>
@@ -40,31 +61,27 @@
   <!-- ─── ANALYZING STATE ─── -->
   <ng-container *ngIf="viewState === 'analyzing'">
     <div class="loading-screen">
-      <div class="loading-ring">
+      <div class="loading-ring pulse">
         <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5"></mat-progress-spinner>
         <mat-icon class="loading-icon">psychology</mat-icon>
       </div>
       <h2 class="loading-title">Reading your post…</h2>
-      <p class="loading-subtitle">Our AI is understanding your intent and preparing a few quick questions</p>
+      <p class="loading-subtitle">We're checking which details we still need from you.</p>
     </div>
   </ng-container>
 
-  <!-- ─── QUESTIONS STATE (STEPPER) ─── -->
+  <!-- ─── QUESTIONS STATE ─── -->
   <ng-container *ngIf="viewState === 'questions' && analyzeResult">
 
-    <!-- Header -->
     <div class="screen-header">
       <div class="category-badge">
-        <mat-icon>category</mat-icon>
-        {{ analyzeResult.categoryDisplayName }}
+        <mat-icon>{{ intent === 'MATRIMONIAL' ? 'ring_volume' : 'favorite_border' }}</mat-icon>
+        {{ intent === 'MATRIMONIAL' ? 'Matrimonial' : 'Dating' }}
       </div>
       <h1 class="screen-title">A Few <span class="accent">Quick Questions</span></h1>
-      <p class="screen-subtitle">
-        Help us understand you better so we can find the right match.
-      </p>
+      <p class="screen-subtitle">Help us understand you better so we can find the right match.</p>
     </div>
 
-    <!-- Step dots + progress bar -->
     <div class="stepper-header">
       <div class="stepper-dots">
         <span
@@ -81,7 +98,6 @@
       </p>
     </div>
 
-    <!-- Question card for current step (2 questions) -->
     <div class="questions-card">
       <div *ngFor="let qa of steps[currentStep]; let i = index" class="question-block">
         <p class="question-text">
@@ -157,15 +173,12 @@
         <mat-divider *ngIf="i < steps[currentStep].length - 1" class="q-divider"></mat-divider>
       </div>
 
-      <!-- Navigation row -->
       <div class="step-nav">
-        <!-- Left: back to post or previous step -->
         <button mat-stroked-button (click)="isFirstStep ? (viewState = 'writing') : prevStep()">
           <mat-icon>arrow_back</mat-icon>
           {{ isFirstStep ? 'Edit Post' : 'Previous' }}
         </button>
 
-        <!-- Right: next step or final submit -->
         <button *ngIf="!isLastStep"
           mat-raised-button color="primary"
           (click)="nextStep()">
@@ -177,7 +190,7 @@
           mat-raised-button color="primary"
           class="submit-btn"
           (click)="submit()">
-          <mat-icon>send</mat-icon> Submit & Find Matches
+          <mat-icon>send</mat-icon> Submit &amp; Find Match
         </button>
       </div>
     </div>
@@ -196,128 +209,45 @@
     </div>
   </ng-container>
 
-  <!-- ─── WAITING STATE ─── -->
-  <ng-container *ngIf="viewState === 'waiting'">
-    <div class="loading-screen">
-      <div class="loading-ring pulse">
-        <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5"></mat-progress-spinner>
-        <mat-icon class="loading-icon">manage_search</mat-icon>
-      </div>
-      <h2 class="loading-title">Finding your matches…</h2>
-      <p class="loading-subtitle">Our AI is scanning profiles and scoring compatibility. This takes a few seconds.</p>
-      <p class="waiting-hint">You'll be notified here the moment we find someone.</p>
-    </div>
-  </ng-container>
-
-  <!-- ─── CONNECTING STATE ─── -->
-  <ng-container *ngIf="viewState === 'connecting'">
-    <div class="loading-screen">
-      <div class="loading-ring">
-        <mat-progress-spinner mode="indeterminate" diameter="72" strokeWidth="5" color="accent"></mat-progress-spinner>
-        <mat-icon class="loading-icon">videocam</mat-icon>
-      </div>
-      <h2 class="loading-title">Match Found!</h2>
-      <p class="loading-subtitle">Your match is online right now. Starting your video call…</p>
-      <p class="waiting-hint">Taking you to the call screen in a moment.</p>
-    </div>
-  </ng-container>
-
-  <!-- ─── NO ACTIVE MATCH STATE ─── -->
-  <ng-container *ngIf="viewState === 'no-active-match'">
+  <!-- ─── SUBMITTED STATE ─── -->
+  <ng-container *ngIf="viewState === 'submitted'">
     <div class="result-screen">
-      <div class="result-icon result-icon--info">
-        <mat-icon>mail_outline</mat-icon>
+      <div class="result-icon result-icon--success">
+        <mat-icon>mark_email_read</mat-icon>
       </div>
-      <h1 class="screen-title">Match <span class="accent">Saved!</span></h1>
+      <h1 class="screen-title">You're in the <span class="accent">Queue!</span></h1>
       <p class="screen-subtitle">
-        We found you a great match, but they're not online right now.
-        We've emailed both of you — you'll get a notification the moment they come online.
+        Your post has been saved. We're searching for your best match right now.
+        <br><br>
+        Once we find someone compatible, we'll schedule a <strong>Zoom meeting</strong>
+        and send both of you an email with the join link.
       </p>
+
+      <div class="submitted-card">
+        <div class="submitted-step">
+          <div class="step-num">1</div>
+          <span>We scan profiles every 15 minutes</span>
+        </div>
+        <div class="submitted-step">
+          <div class="step-num">2</div>
+          <span>We find your best match and book a Zoom call</span>
+        </div>
+        <div class="submitted-step">
+          <div class="step-num">3</div>
+          <span>You both get an email with the meeting link</span>
+        </div>
+      </div>
+
       <div class="action-row">
-        <button mat-raised-button color="primary" class="action-btn" routerLink="/dashboard/scheduled-match">
-          <mat-icon>videocam</mat-icon> Go to Meetings
+        <button mat-raised-button color="primary" class="action-btn"
+                routerLink="/dashboard/scheduled-match">
+          <mat-icon>video_camera_front</mat-icon> View My Meetings
         </button>
         <button mat-stroked-button class="action-btn" (click)="reset()">
           <mat-icon>edit_note</mat-icon> Write Another Post
         </button>
       </div>
     </div>
-  </ng-container>
-
-  <!-- ─── NO MATCH AT ALL STATE ─── -->
-  <ng-container *ngIf="viewState === 'no-match'">
-    <div class="result-screen">
-      <div class="result-icon result-icon--info">
-        <mat-icon>hourglass_top</mat-icon>
-      </div>
-      <h1 class="screen-title">Post <span class="accent">Saved!</span></h1>
-      <p class="screen-subtitle">No match found yet. We'll notify you as soon as someone matching your profile joins.</p>
-      <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
-        <mat-icon>edit_note</mat-icon> Write Another Post
-      </button>
-    </div>
-  </ng-container>
-
-  <!-- ─── RESULT STATE ─── -->
-  <ng-container *ngIf="viewState === 'result' && matchResult">
-
-    <!-- MATCH FOUND -->
-    <ng-container *ngIf="matchResult.event === 'POST_MATCH_FOUND'">
-      <div class="result-screen">
-        <div class="result-icon result-icon--success">
-          <mat-icon>favorite</mat-icon>
-        </div>
-        <h1 class="screen-title">Match <span class="accent">Found!</span></h1>
-        <p class="screen-subtitle">{{ matchResult.message }}</p>
-
-        <mat-card class="match-card">
-          <mat-card-content>
-            <div class="match-score-row">
-              <div class="score-circle">
-                <span class="score-num">{{ matchScorePercent }}</span>
-                <span class="score-pct">%</span>
-              </div>
-              <div class="score-label">Compatibility Score</div>
-            </div>
-            <mat-divider class="score-divider"></mat-divider>
-            <p class="match-hint">Open the app to view your match and start a conversation.</p>
-          </mat-card-content>
-        </mat-card>
-
-        <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
-          <mat-icon>edit_note</mat-icon> Write Another Post
-        </button>
-      </div>
-    </ng-container>
-
-    <!-- NO MATCH YET -->
-    <ng-container *ngIf="matchResult.event === 'POST_NO_MATCH_FOUND'">
-      <div class="result-screen">
-        <div class="result-icon result-icon--info">
-          <mat-icon>hourglass_top</mat-icon>
-        </div>
-        <h1 class="screen-title">Post <span class="accent">Saved!</span></h1>
-        <p class="screen-subtitle">{{ matchResult.message }}</p>
-        <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
-          <mat-icon>edit_note</mat-icon> Write Another Post
-        </button>
-      </div>
-    </ng-container>
-
-    <!-- ERROR -->
-    <ng-container *ngIf="matchResult.event === 'POST_MATCH_ERROR'">
-      <div class="result-screen">
-        <div class="result-icon result-icon--warn">
-          <mat-icon>warning_amber</mat-icon>
-        </div>
-        <h1 class="screen-title">Post <span class="accent">Saved</span></h1>
-        <p class="screen-subtitle">{{ matchResult.message }}</p>
-        <button mat-raised-button color="primary" class="action-btn" (click)="reset()">
-          <mat-icon>refresh</mat-icon> Try Again
-        </button>
-      </div>
-    </ng-container>
-
   </ng-container>
 
 </div>

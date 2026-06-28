@@ -1,57 +1,19 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {DashboardComponent} from './dashboard.component';
-import {UserProfileComponent} from './user/user-profile/user-profile.component';
-import {InstantMatchComponent} from './instant-match/instant-match.component';
-import {ScheduledMatchComponent} from './scheduled-match/scheduled-match.component';
-import {HomeComponent} from './home/home.component';
-import {PostMatchComponent} from './post-match/post-match.component';
-
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { DashboardComponent } from './dashboard.component';
+import { UserProfileComponent } from './user/user-profile/user-profile.component';
+import { ScheduledMatchComponent } from './scheduled-match/scheduled-match.component';
+import { PostMatchComponent } from './post-match/post-match.component';
 
 const routes: Routes = [
   {
     path: '',
     component: DashboardComponent,
     children: [
-      {
-        path: 'home',
-        component: HomeComponent,
-        pathMatch: 'full',
-      },
-      {
-        path: 'profile',
-        component: UserProfileComponent,
-        pathMatch: 'full',
-      },
-      {
-        path: 'instance-meeting',
-        component: InstantMatchComponent,
-        pathMatch: 'full',
-      },
-      {
-        path: 'instant-match',
-        redirectTo: 'instance-meeting',
-        pathMatch: 'full',
-      },
-      {
-        path: 'scheduled-match',
-        component: ScheduledMatchComponent,
-        pathMatch: 'full',
-      },
-      {
-        path: 'post-match',
-        component: PostMatchComponent,
-        pathMatch: 'full',
-      },
-      {
-        path: 'chat-bot',
-        loadChildren: () => import('./chat-bot/chat-bot.module').then(m => m.ChatBotModule),
-      },
-      {
-        path: '',
-        redirectTo: 'post-match',
-        pathMatch: 'full',
-      },
+      { path: 'post-match',      component: PostMatchComponent,     pathMatch: 'full' },
+      { path: 'scheduled-match', component: ScheduledMatchComponent, pathMatch: 'full' },
+      { path: 'profile',         component: UserProfileComponent,    pathMatch: 'full' },
+      { path: '',                redirectTo: 'post-match',           pathMatch: 'full' },
     ],
   },
 ];
@@ -60,5 +22,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class DashboardRoutingModule {
-}
+export class DashboardRoutingModule {}

@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 
 export interface UpcomingMeeting {
   id: string;
-  matchId: string;
+  matchResultId: string;
   roundNumber: number;
   scheduledAt: string;
   durationMinutes: number;
@@ -16,6 +16,9 @@ export interface UpcomingMeeting {
   peerFirstName: string;
   peerLastName: string;
   peerCognitoSub: string;
+  zoomMeetingId: string;
+  zoomJoinUrl: string;
+  zoomPassword: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -30,17 +33,7 @@ export class MeetingService {
     return this.http.get<BaseVO<UpcomingMeeting[]>>(`${this.base}/user/${sub}/upcoming`);
   }
 
-  markCompleted(id: string): Observable<BaseVO<void>> {
-    return this.http.patch<BaseVO<void>>(`${this.base}/${id}/cancel`, {});
-  }
-
   submitFeedback(meetingId: string, response: 'YES' | 'NO', notes?: string): Observable<BaseVO<void>> {
     return this.http.post<BaseVO<void>>(`${this.base}/${meetingId}/feedback`, { response, notes });
-  }
-
-  requestNextMatch(): Observable<BaseVO<{ connecting: boolean }>> {
-    return this.http.post<BaseVO<{ connecting: boolean }>>(
-      `${environment.apiUrl}/api/v1/matches/next`, {}
-    );
   }
 }

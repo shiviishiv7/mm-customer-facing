@@ -1,145 +1,133 @@
-<div class="scheduled-match">
+<div class="meetings-wrapper">
 
-  <!-- ── Video elements always in DOM so @ViewChild refs are never null ─────── -->
-  <div class="video-section"
-       [class.hidden]="(state$ | async) === 'idle' || (state$ | async) === 'waiting-room' || (state$ | async) === 'ended'">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-icon">
+      <mat-icon>video_camera_front</mat-icon>
+    </div>
+    <h1 class="page-title">My <span class="accent">Meetings</span></h1>
+    <p class="page-subtitle">Your upcoming Zoom meetings with your matches.</p>
+  </div>
 
-    <div class="video-grid">
-      <div class="video-col">
-        <div class="video-tile">
-          <video #localVideo autoplay playsinline muted class="video-player"></video>
-          <span class="label">You</span>
+  <!-- Loading -->
+  <ng-container *ngIf="loading">
+    <div class="loading-center">
+      <mat-progress-spinner mode="indeterminate" diameter="48" color="primary"></mat-progress-spinner>
+    </div>
+  </ng-container>
+
+  <!-- Empty state -->
+  <ng-container *ngIf="!loading && meetings.length === 0">
+    <div class="empty-state">
+      <mat-icon class="empty-icon">calendar_today</mat-icon>
+      <h2>No meetings yet</h2>
+      <p>Once we find your match, a Zoom meeting will be scheduled and you'll get an email.</p>
+      <button mat-raised-button color="primary" routerLink="/dashboard/post-match">
+        <mat-icon>edit_note</mat-icon> Post & Find Match
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Meetings list -->
+  <div class="meetings-list" *ngIf="!loading && meetings.length > 0">
+    <div class="meeting-card" *ngFor="let m of meetings">
+
+      <!-- Meeting header -->
+      <div class="meeting-card-header">
+        <div class="peer-avatar">
+          {{ (m.peerFirstName || '?')[0].toUpperCase() }}
         </div>
-        <button class="meme-btn-inline" (click)="openMemePicker()">
-          😂 {{ (memeStream.activeMeme$ | async) ? 'Change Meme' : 'Pick a Meme' }}
-        </button>
+        <div class="peer-info">
+          <span class="peer-name">{{ m.peerFirstName }} {{ m.peerLastName }}</span>
+          <span class="meeting-round">Round {{ m.roundNumber }}</span>
+        </div>
+        <span class="status-badge"
+          [class.status-badge--upcoming]="!isPastMeeting(m)"
+          [class.status-badge--past]="isPastMeeting(m)">
+          {{ isPastMeeting(m) ? 'Completed' : 'Upcoming' }}
+        </span>
       </div>
-      <div class="video-tile peer-tile">
-        <video #remoteVideo autoplay playsinline class="video-player"
-               [class.hidden]="(state$ | async) !== 'in-call'"></video>
 
-        <div class="peer-placeholder" *ngIf="(state$ | async) === 'waiting-for-peer'">
-          <mat-icon class="peer-icon">person</mat-icon>
-          <p>User will be joining soon.</p>
-          <p class="sub-text">Please wait...</p>
-          <mat-progress-spinner mode="indeterminate" diameter="32" color="accent"></mat-progress-spinner>
+      <mat-divider></mat-divider>
+
+      <!-- Meeting details -->
+      <div class="meeting-details">
+        <div class="detail-row">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ m.scheduledAt | date:'EEE, d MMM y · h:mm a' }} IST</span>
         </div>
+        <div class="detail-row">
+          <mat-icon>timer</mat-icon>
+          <span>{{ m.durationMinutes }} minutes</span>
+        </div>
+        <div class="detail-row" *ngIf="m.zoomMeetingId">
+          <mat-icon>video_call</mat-icon>
+          <span>Meeting ID: {{ m.zoomMeetingId }}</span>
+        </div>
+        <div class="detail-row" *ngIf="m.zoomPassword">
+          <mat-icon>lock</mat-icon>
+          <span>Password: {{ m.zoomPassword }}</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="meeting-actions">
+
+        <!-- Join Zoom — always visible if link exists -->
+        <a *ngIf="m.zoomJoinUrl"
+           [href]="m.zoomJoinUrl"
+           target="_blank"
+           mat-raised-button
+           color="primary"
+           class="join-btn">
+          <mat-icon>videocam</mat-icon>
+          Join Zoom Meeting
+        </a>
+
+        <!-- Feedback — shown after meeting time -->
+        <ng-container *ngIf="isPastMeeting(m)">
+
+          <!-- Not yet submitted -->
+          <ng-container *ngIf="m.feedbackState !== 'done'">
+            <div class="feedback-inline" *ngIf="selectedMeetingForFeedback?.id !== m.id">
+              <button mat-stroked-button (click)="openFeedback(m)" [disabled]="m.feedbackState === 'submitting'">
+                <mat-icon>rate_review</mat-icon> Give Feedback
+              </button>
+            </div>
+
+            <div class="feedback-question" *ngIf="selectedMeetingForFeedback?.id === m.id">
+              <p class="feedback-prompt">Would you like to meet <strong>{{ m.peerFirstName }}</strong> again?</p>
+              <div class="feedback-btns">
+                <button mat-raised-button color="primary"
+                  [disabled]="m.feedbackState === 'submitting'"
+                  (click)="submitFeedback(m, 'YES')">
+                  <mat-progress-spinner *ngIf="m.feedbackState === 'submitting'" mode="indeterminate" diameter="16" strokeWidth="2"></mat-progress-spinner>
+                  <mat-icon *ngIf="m.feedbackState !== 'submitting'">thumb_up</mat-icon>
+                  Yes, meet again
+                </button>
+                <button mat-stroked-button color="warn"
+                  [disabled]="m.feedbackState === 'submitting'"
+                  (click)="submitFeedback(m, 'NO')">
+                  <mat-icon>thumb_down</mat-icon>
+                  No thanks
+                </button>
+                <button mat-button (click)="closeFeedback()">Cancel</button>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Submitted -->
+          <div class="feedback-done" *ngIf="m.feedbackState === 'done'">
+            <mat-icon>{{ m.feedbackSubmitted === 'YES' ? 'favorite' : 'check_circle' }}</mat-icon>
+            <span>{{ m.feedbackSubmitted === 'YES'
+              ? 'You said yes — we\'ll let you know if they do too!'
+              : 'Feedback recorded. Looking for your next match.' }}</span>
+          </div>
+
+        </ng-container>
+
       </div>
     </div>
-
-    <button class="end-call-btn" (click)="endCall()">End Call</button>
-  </div>
-
-  <!-- ── Idle: show upcoming meetings list ─────────────────────────────────── -->
-  <div class="meeting-list-panel" *ngIf="(state$ | async) === 'idle'">
-    <h2>📅 Upcoming Meetings</h2>
-
-    <ng-container *ngIf="loadingMeetings; else meetingListRef">
-      <mat-progress-spinner mode="indeterminate" diameter="36" color="primary"></mat-progress-spinner>
-    </ng-container>
-
-    <ng-template #meetingListRef>
-      <p class="empty-state" *ngIf="(upcomingMeetings$ | async)?.length === 0">
-        No upcoming meetings. Set your filters to get matched!<br>
-        <button mat-flat-button color="primary" class="filter-btn" style="margin-top:1rem" (click)="openFilters()">
-          <mat-icon>tune</mat-icon>
-          Set Filters &amp; Find Match
-        </button>
-      </p>
-
-      <div class="meeting-card" *ngFor="let m of upcomingMeetings$ | async">
-        <div class="meeting-info">
-          <span class="peer-name">{{ m.peerFirstName }} {{ m.peerLastName }}</span>
-          <span class="meeting-time">{{ m.scheduledAt | date: 'EEE, MMM d · h:mm a' }}</span>
-          <span class="meeting-meta">Round {{ m.roundNumber }} · {{ m.durationMinutes }} min</span>
-        </div>
-        <button class="connect-btn" (click)="connectMeeting(m)">
-          <mat-icon style="font-size:1rem;height:1rem;width:1rem">videocam</mat-icon>
-          Connect
-        </button>
-      </div>
-    </ng-template>
-  </div>
-
-  <!-- ── Waiting Room: scheduledAt reached, user must click Join ───────────── -->
-  <div class="state-panel" *ngIf="(state$ | async) === 'waiting-room'">
-    <div class="icon">🔔</div>
-    <h2>Your meeting is starting!</h2>
-    <p>Click below to enter the meeting room. Your camera will turn on when you join.</p>
-    <p class="meeting-id">Meeting ID: {{ meeting$ | async }}</p>
-    <button class="join-btn" (click)="joinCall()">
-      <mat-icon>videocam</mat-icon>
-      Join Call
-    </button>
-  </div>
-
-  <!-- ── Call ended → Feedback form ──────────────────────────────────────── -->
-  <div class="state-panel feedback-panel" *ngIf="(state$ | async) === 'ended'">
-
-    <!-- Feedback not yet submitted -->
-    <ng-container *ngIf="!feedbackSubmitted">
-      <div class="icon">🤝</div>
-      <h2>How did it go?</h2>
-      <p>Would you like to meet this person again?</p>
-
-      <textarea
-        [(ngModel)]="feedbackNotes"
-        placeholder="Optional note (only visible to you)"
-        rows="3"
-        class="feedback-notes">
-      </textarea>
-
-      <div class="feedback-actions">
-        <button mat-raised-button color="primary" class="feedback-btn yes-btn" (click)="submitFeedback('YES')">
-          <mat-icon>thumb_up</mat-icon> Yes, meet again
-        </button>
-        <button mat-stroked-button color="warn" class="feedback-btn no-btn" (click)="submitFeedback('NO')">
-          <mat-icon>thumb_down</mat-icon> No thanks
-        </button>
-      </div>
-    </ng-container>
-
-    <!-- Feedback submitted — offer next match or back -->
-    <ng-container *ngIf="feedbackSubmitted">
-      <div class="icon">✅</div>
-      <h2>Feedback recorded!</h2>
-      <p>Want to connect with your next match right now?</p>
-
-      <!-- Next match result: connecting -->
-      <ng-container *ngIf="nextMatchResult === 'connecting'">
-        <div class="next-match-status connecting">
-          <mat-progress-spinner mode="indeterminate" diameter="32" color="accent"></mat-progress-spinner>
-          <span>Your next match is online — connecting now…</span>
-        </div>
-      </ng-container>
-
-      <!-- Next match result: no one online -->
-      <ng-container *ngIf="nextMatchResult === 'no-active'">
-        <div class="next-match-status no-active">
-          <mat-icon>mail_outline</mat-icon>
-          <span>No match is online right now. We'll notify you when one becomes available.</span>
-        </div>
-      </ng-container>
-
-      <!-- Buttons only when no result yet -->
-      <div class="after-feedback-actions" *ngIf="!nextMatchResult">
-        <button mat-raised-button color="primary" class="feedback-btn"
-                (click)="requestNextMatch()" [disabled]="requestingNext">
-          <mat-progress-spinner *ngIf="requestingNext" mode="indeterminate" diameter="18" strokeWidth="3"></mat-progress-spinner>
-          <mat-icon *ngIf="!requestingNext">skip_next</mat-icon>
-          Next Match
-        </button>
-        <button mat-stroked-button class="feedback-btn" (click)="backToList()">
-          <mat-icon>list</mat-icon> Back to Meetings
-        </button>
-      </div>
-
-      <button mat-button class="feedback-btn back-btn"
-              *ngIf="nextMatchResult" (click)="backToList()">
-        <mat-icon>list</mat-icon> Back to Meetings
-      </button>
-    </ng-container>
-
   </div>
 
 </div>

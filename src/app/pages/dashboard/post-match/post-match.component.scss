@@ -62,6 +62,128 @@
   mat-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
+// ─── Intent selector ──────────────────────────────────────────────────────
+
+.intent-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.intent-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+  background: #fafafa;
+  color: #666;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+  &:hover {
+    border-color: #6c47ff;
+    color: #6c47ff;
+    background: #f5f2ff;
+  }
+
+  &--active {
+    background: #6c47ff;
+    border-color: #6c47ff;
+    color: #fff;
+
+    &:hover { background: #5535ee; }
+  }
+}
+
+// ─── Submitted card ────────────────────────────────────────────────────────
+
+.submitted-card {
+  width: 100%;
+  max-width: 420px;
+  background: #f8f7ff;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.submitted-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.step-num {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #6c47ff;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// ─── Stepper ───────────────────────────────────────────────────────────────
+
+.stepper-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.stepper-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.stepper-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ddd;
+  transition: background 0.2s;
+
+  &--active { background: #6c47ff; }
+  &--done   { background: #a68eff; }
+}
+
+.stepper-progress {
+  font-size: 13px;
+  color: #999;
+  margin: 0;
+}
+
+// ─── Step nav ──────────────────────────────────────────────────────────────
+
+.step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 28px;
+  gap: 12px;
+}
+
+.submit-btn {
+  flex: 1;
+}
+
 // ─── Input card ────────────────────────────────────────────────────────────
 
 .input-card {
