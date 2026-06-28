@@ -37,6 +37,23 @@
 
         <!-- Main Content -->
         <mat-drawer-content class="mat-drawer-content">
+
+          <!-- Profile incomplete banner -->
+          <div *ngIf="commBus.user && commBus.user.isProfileComplete === false" class="profile-incomplete-banner">
+            <div class="banner-content">
+              <mat-icon class="banner-icon">person_off</mat-icon>
+              <div class="banner-text">
+                <strong>Complete your profile</strong>
+                <span>Add your date of birth, gender, city and state to start matching.</span>
+              </div>
+              <button mat-raised-button color="primary" class="banner-btn"
+                      [routerLink]="['/dashboard/profile']"
+                      [queryParams]="{sub: commBus.sub}">
+                <mat-icon>edit</mat-icon> Complete Profile
+              </button>
+            </div>
+          </div>
+
           <router-outlet></router-outlet>
         </mat-drawer-content>
       </mat-drawer-container>

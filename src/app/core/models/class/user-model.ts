@@ -21,4 +21,12 @@ export class UserModel {
   addressVO?: AddressVO;
   status?: string;
   isActive?: boolean;
+  isProfileComplete?: boolean;
+  currentCity?: string;
+  currentState?: string;
+  currentCountry?: string;
+  name?: string;
+  profilePhotoUrl?: string;
+  tagline?: string;
+  aboutMe?: string;
 }

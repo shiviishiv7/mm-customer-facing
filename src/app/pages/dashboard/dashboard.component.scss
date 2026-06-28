@@ -52,3 +52,58 @@
     color: #ddd;
   }
 }
+
+
+// ─── Profile incomplete banner ─────────────────────────────────────────────
+
+.profile-incomplete-banner {
+  background: linear-gradient(135deg, #fff8e1, #fff3cd);
+  border-bottom: 2px solid #f59e0b;
+  padding: 12px 24px;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .banner-icon {
+    color: #f59e0b;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .banner-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 14px;
+      font-weight: 700;
+      color: #92400e;
+    }
+
+    span {
+      font-size: 13px;
+      color: #78350f;
+    }
+  }
+
+  .banner-btn {
+    flex-shrink: 0;
+    font-size: 13px;
+    height: 36px;
+    mat-icon { font-size: 16px; width: 16px; height: 16px; margin-right: 4px; }
+  }
+
+  @media (max-width: 600px) {
+    .banner-content { flex-wrap: wrap; }
+    .banner-btn { width: 100%; }
+  }
+}
