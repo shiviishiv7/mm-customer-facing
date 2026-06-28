@@ -105,10 +105,18 @@
           {{ qa.question.question }}
         </p>
 
-        <!-- text -->
-        <ng-container *ngIf="qa.question.type === 'text'">
+        <!-- city — browser autocomplete, no spellcheck -->
+        <ng-container *ngIf="qa.question.type === 'city'">
           <mat-form-field appearance="outline" class="full-width">
-            <input matInput [(ngModel)]="qa.value" [placeholder]="qa.question.placeholder || ''">
+            <input
+              matInput
+              [(ngModel)]="qa.value"
+              [placeholder]="qa.question.placeholder || 'Enter city name'"
+              autocomplete="address-level2"
+              spellcheck="false"
+              autocorrect="off"
+              autocapitalize="words">
+            <mat-hint>Type your city name</mat-hint>
           </mat-form-field>
         </ng-container>
 

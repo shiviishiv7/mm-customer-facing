@@ -149,6 +149,7 @@ export class PostMatchComponent implements OnInit, OnDestroy {
     switch (qa.question.type) {
       case 'multi_choice': return qa.selectedOptions.join(',');
       case 'range':        return `${qa.rangeMin}-${qa.rangeMax}`;
+      case 'city':         return qa.value.trim();
       default:             return qa.value;
     }
   }

@@ -8,7 +8,7 @@ export type IntentType = 'DATING' | 'MATRIMONIAL';
 export interface PostQuestion {
   id: string;
   question: string;
-  type: 'text' | 'single_choice' | 'multi_choice' | 'range' | 'boolean' | 'dropdown';
+  type: 'city' | 'single_choice' | 'multi_choice' | 'range' | 'boolean' | 'dropdown';
   options?: string[];
   placeholder?: string;
   min?: number;
